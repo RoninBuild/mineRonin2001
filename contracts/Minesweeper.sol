@@ -9,3 +9,14 @@ contract Minesweeper {
     struct Cell { bool isMine; CellState state; uint8 adjacentMines; }
 }
 
+
+
+function _generateBoard(bytes32 seed) internal {
+    uint8 placed = 0;
+    while (placed < MINES) {
+        uint256 rand = uint256(keccak256(abi.encodePacked(seed, placed)));
+        (uint8 x, uint8 y) = (uint8(rand % SIZE), uint8((rand >> 8) % SIZE));
+        if (!board[x][y].isMine) { board[x][y].isMine = true; placed++; }
+    }
+}
+
