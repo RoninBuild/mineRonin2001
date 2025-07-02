@@ -20,3 +20,12 @@ function _generateBoard(bytes32 seed) internal {
     }
 }
 
+
+
+function reveal(uint8 x, uint8 y) external {
+    require(board[x][y].state == CellState.Hidden, "Already revealed");
+    board[x][y].state = CellState.Revealed;
+    if (board[x][y].isMine) { /* game over */ }
+    else if (board[x][y].adjacentMines == 0) { /* flood fill */ }
+}
+
