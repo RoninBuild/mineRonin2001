@@ -29,3 +29,12 @@ function reveal(uint8 x, uint8 y) external {
     else if (board[x][y].adjacentMines == 0) { /* flood fill */ }
 }
 
+
+
+function _floodFill(uint8 x, uint8 y) internal {
+    for (int8 dx = -1; dx <= 1; dx++)
+        for (int8 dy = -1; dy <= 1; dy++)
+            if (_inBounds(x+dx, y+dy) && board[uint8(x+dx)][uint8(y+dy)].state == CellState.Hidden)
+                reveal(uint8(x+dx), uint8(y+dy));
+}
+
