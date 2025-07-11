@@ -38,3 +38,10 @@ function _floodFill(uint8 x, uint8 y) internal {
                 reveal(uint8(x+dx), uint8(y+dy));
 }
 
+
+
+function toggleFlag(uint8 x, uint8 y) external {
+    require(board[x][y].state != CellState.Revealed, "Already revealed");
+    board[x][y].state = board[x][y].state == CellState.Flagged ? CellState.Hidden : CellState.Flagged;
+}
+
