@@ -45,3 +45,12 @@ function toggleFlag(uint8 x, uint8 y) external {
     board[x][y].state = board[x][y].state == CellState.Flagged ? CellState.Hidden : CellState.Flagged;
 }
 
+
+
+function checkWin() public view returns (bool) {
+    for (uint8 x = 0; x < SIZE; x++)
+        for (uint8 y = 0; y < SIZE; y++)
+            if (!board[x][y].isMine && board[x][y].state != CellState.Revealed) return false;
+    return true;
+}
+
