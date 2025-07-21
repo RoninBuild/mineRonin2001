@@ -117,3 +117,12 @@ export default function Home() {
     </div>
   );
 }
+
+
+import { useAccount } from 'wagmi'
+import { ConnectButton } from '@rainbow-me/rainbowkit'
+export default function Home() {
+    const { isConnected } = useAccount()
+    return isConnected ? <GameBoard /> : <ConnectButton />
+}
+
