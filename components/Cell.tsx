@@ -6,3 +6,7 @@ export function Cell({ cell, onReveal, onFlag }: Props) {
     return <div className="bg-gray-300 hover:bg-gray-400" onClick={onReveal} />
 }
 
+
+
+if (cell.state === 'Flagged') return <div onClick={onFlag}>🚩</div> // no reveal, only unflag
+
