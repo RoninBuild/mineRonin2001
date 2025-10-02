@@ -53,3 +53,8 @@
     @apply bg-red-600 text-white;
   }
 }
+
+
+body { background: #0a0a1a; color: #0f0; }
+.cell { border: 1px solid #0f0; }
+
