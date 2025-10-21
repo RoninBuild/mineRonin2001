@@ -54,3 +54,8 @@ function checkWin() public view returns (bool) {
     return true;
 }
 
+
+
+mapping(address => bool) public players;
+function joinGame() external { require(players[msg.sender] == false); players[msg.sender] = true; }
+
