@@ -10,3 +10,7 @@ export function Cell({ cell, onReveal, onFlag }: Props) {
 
 if (cell.state === 'Flagged') return <div onClick={onFlag}>🚩</div> // no reveal, only unflag
 
+
+
+onContextMenu={(e) => { e.preventDefault(); onFlag(); }}
+
