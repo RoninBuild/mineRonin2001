@@ -8,3 +8,7 @@ export function Board({ cells, onReveal, onFlag }: Props) {
     </div>
 }
 
+
+
+export const Board = React.memo(function Board({ cells, onReveal, onFlag }: Props) {
+
