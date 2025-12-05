@@ -59,3 +59,10 @@ function checkWin() public view returns (bool) {
 mapping(address => bool) public players;
 function joinGame() external { require(players[msg.sender] == false); players[msg.sender] = true; }
 
+
+
+uint256 public totalGames;
+uint256 public totalWins;
+mapping(address => uint256) public wins;
+function _recordWin(address player) internal { totalWins++; wins[player]++; }
+
