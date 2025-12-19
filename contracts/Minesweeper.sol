@@ -66,3 +66,7 @@ uint256 public totalWins;
 mapping(address => uint256) public wins;
 function _recordWin(address player) internal { totalWins++; wins[player]++; }
 
+
+
+function claimReward() external { require(checkWin()); payable(msg.sender).transfer(0.001 ether); }
+
