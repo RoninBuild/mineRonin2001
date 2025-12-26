@@ -8,3 +8,10 @@ contract Campaign {
     }
 }
 
+
+
+function getLevelConfig() view returns (uint8 size, uint8 mines) {
+    uint8 lvl = currentLevel > 30 ? 30 : currentLevel;
+    return (8 + lvl, 8 + lvl * 2);
+}
+
