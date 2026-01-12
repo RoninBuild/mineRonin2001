@@ -58,3 +58,8 @@
 body { background: #0a0a1a; color: #0f0; }
 .cell { border: 1px solid #0f0; }
 
+
+
+.cell:hover { background: #1a1a2a; transform: scale(1.05); }
+.cell:active { transform: scale(0.95); }
+
