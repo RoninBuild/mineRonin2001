@@ -15,7 +15,7 @@ export default function ChallengeScreen() {
   const { address } = useAccount();
   const { setScreen } = useAppStore();
   const { setMode, startGame } = useGameStore();
-  
+
   const [selectedMode, setSelectedMode] = useState<ChallengeMode>('daily');
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [hasEnteredWeekly, setHasEnteredWeekly] = useState(false);
@@ -55,13 +55,13 @@ export default function ChallengeScreen() {
 
   const handleEnterWeekly = async () => {
     if (!address) return;
-    
+
     setLoading(true);
     try {
       logEvent('challenge_enter', address, { mode: 'weekly' });
-      
+
       const txHash = await enterWeeklyChallenge(address);
-      
+
       if (txHash) {
         setHasEnteredWeekly(true);
         alert('Entered weekly challenge! 1 USDC paid ✓');
