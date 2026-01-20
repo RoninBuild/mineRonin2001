@@ -14,7 +14,7 @@ export async function purchaseSkinWithUSDC(
   try {
     // 1. Approve USDC
     const usdcAmount = parseUnits(tier.toString(), 6); // USDC has 6 decimals
-    
+
     const approveHash = await writeContract({
       address: USDC_ADDRESS,
       abi: [
