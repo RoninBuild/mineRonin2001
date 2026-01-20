@@ -28,19 +28,19 @@ export default function ShopScreen() {
 
   const handlePurchase = async (skinId: number, tier: number) => {
     if (!address) return;
-    
+
     setLoading(true);
-    
+
     try {
       logEvent('purchase_click', address, { category, skinId, tier });
-      
+
       const txHash = await purchaseSkinWithUSDC(
         address,
         category === 'fields' ? 'field' : 'flag',
         tier,
         skinId - 1 // catalog index
       );
-      
+
       if (txHash) {
         addOwnedSkin(category, skinId);
         logEvent('purchase_success', address, { category, skinId, tier, txHash });
@@ -86,7 +86,7 @@ export default function ShopScreen() {
       <div className="flex flex-col gap-3 w-full max-w-sm">
         {SKIN_CATALOG[category].map((skin) => {
           const owned = ownedSkins[category].includes(skin.id);
-          
+
           return (
             <div key={skin.id} className="panel p-4">
               <div className="flex justify-between items-center mb-3">
@@ -95,7 +95,7 @@ export default function ShopScreen() {
                   <span className="text-green-400 text-xs">✓ OWNED</span>
                 )}
               </div>
-              
+
               {!owned && (
                 <button
                   onClick={() => handlePurchase(skin.id, skin.tier)}

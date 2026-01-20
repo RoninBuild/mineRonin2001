@@ -29,7 +29,7 @@ export async function enterWeeklyChallenge(userAddress: string): Promise<string 
   try {
     // 1. Approve 1 USDC
     const usdcAmount = parseUnits('1', 6);
-    
+
     const approveHash = await writeContract({
       address: USDC_ADDRESS,
       abi: [

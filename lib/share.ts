@@ -2,7 +2,7 @@ export function shareResult(won: boolean, difficulty: string, timeSeconds: numbe
   const emoji = won ? '🥷' : '💥';
   const status = won ? 'Cleared' : 'Lost';
   const text = `${emoji} MINE RONIN – ${status} ${difficulty.toUpperCase()} in ${timeSeconds}s on Base`;
-  
+
   if (navigator.share) {
     navigator.share({
       text,
