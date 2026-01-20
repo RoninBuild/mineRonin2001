@@ -2,7 +2,7 @@ import { supabase } from './client';
 
 export async function getDailyLeaderboard() {
   const today = new Date().toISOString().split('T')[0];
-  
+
   const { data, error } = await supabase
     .from('game_results')
     .select('address, time_seconds')
@@ -13,8 +13,8 @@ export async function getDailyLeaderboard() {
     .limit(50);
 
   if (error) throw error;
-  
-  return data.map(d => ({ address: d.address, time: d.time_seconds }));
+
+  return data.map((d) => ({ address: d.address, time: d.time_seconds }));
 }
 
 export async function getStreakLeaderboard() {
@@ -25,14 +25,14 @@ export async function getStreakLeaderboard() {
     .limit(50);
 
   if (error) throw error;
-  
-  return data.map(d => ({ address: d.address, streak: d.best_streak }));
+
+  return data.map((d) => ({ address: d.address, streak: d.best_streak }));
 }
 
 export async function getWeeklyLeaderboard() {
   const weekStart = new Date();
   weekStart.setDate(weekStart.getDate() - weekStart.getDay() + 1); // Monday
-  
+
   const { data, error } = await supabase
     .from('weekly_challenge_entries')
     .select('address, best_time')
@@ -42,6 +42,6 @@ export async function getWeeklyLeaderboard() {
     .limit(50);
 
   if (error) throw error;
-  
-  return data.map(d => ({ address: d.address, time: d.best_time }));
+
+  return data.map((d) => ({ address: d.address, time: d.best_time }));
 }
