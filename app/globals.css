@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-base-border;
+  }
+  body {
+    @apply bg-base-bg text-white antialiased;
+    font-family: system-ui, -apple-system, sans-serif;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-6 py-3 bg-base-primary text-white rounded-lg font-medium \
+           hover:bg-blue-600 active:scale-95 transition-all;
+  }
+  
+  .btn-secondary {
+    @apply px-6 py-3 bg-base-panel border border-base-border text-white \
+           rounded-lg font-medium hover:bg-gray-700 active:scale-95 transition-all;
+  }
+  
+  .panel {
+    @apply bg-base-panel border border-base-border rounded-xl p-4;
+  }
+  
+  .cell {
+    @apply border border-gray-700 transition-all font-bold select-none;
+  }
+  
+  .cell-hidden {
+    @apply bg-gray-800 hover:bg-gray-700;
+  }
+  
+  .cell-revealed {
+    @apply bg-gray-900 text-blue-400;
+  }
+  
+  .cell-flagged {
+    @apply bg-blue-600 text-white;
+  }
+  
+  .cell-mine {
+    @apply bg-red-600 text-white;
+  }
+}
