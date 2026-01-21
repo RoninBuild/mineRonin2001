@@ -1,7 +1,7 @@
 'use client';
 
-import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { useMemo } from 'react';
+import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { base } from 'viem/chains';
 
 export default function ConnectScreen() {
@@ -10,7 +10,6 @@ export default function ConnectScreen() {
   const { disconnect } = useDisconnect();
 
   const isOnBase = chainId === base.id;
-
   const connectOptions = useMemo(
     () =>
       connectors.map((connector) => ({
@@ -50,7 +49,7 @@ export default function ConnectScreen() {
       {isConnected && !isOnBase && (
         <div className="flex flex-col items-center gap-3 text-center">
           <p className="text-sm text-yellow-300">
-            Switch to Base to continue.
+            Switch to Base Mainnet.
           </p>
           <button
             type="button"

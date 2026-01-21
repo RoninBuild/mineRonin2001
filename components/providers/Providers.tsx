@@ -3,7 +3,7 @@
 import { ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WagmiProvider } from 'wagmi';
-import { http, createConfig } from 'wagmi';
+import { createConfig, http } from 'wagmi';
 import { base } from 'viem/chains';
 import { coinbaseWallet, injected } from 'wagmi/connectors';
 
