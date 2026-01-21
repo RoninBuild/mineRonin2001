@@ -2,9 +2,6 @@
   "name": "mine-ronin",
   "version": "1.0.0",
   "private": true,
-  "overrides": {
-    "viem": "^2.44.4"
-  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -14,21 +11,21 @@
     "contracts:deploy": "cd contracts && forge script script/Deploy.s.sol --rpc-url $BASE_RPC_URL --broadcast --verify"
   },
   "dependencies": {
-    "@coinbase/onchainkit": "^0.30.0",
-    "@tanstack/react-query": "^5.0.0",
+    "@coinbase/onchainkit": "^1.1.2",
+    "@tanstack/react-query": "^5.81.5",
     "@supabase/supabase-js": "^2.39.0",
-    "next": "14.1.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "next": "^16.1.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "siwe": "^2.1.4",
-    "viem": "^2.44.4",
-    "wagmi": "^2.16.0",
+    "viem": "^2.31.6",
+    "wagmi": "^2.16.3",
     "zustand": "^4.5.0"
   },
   "devDependencies": {
     "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
     "eslint-config-next": "14.1.0",
