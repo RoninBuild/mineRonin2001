@@ -8,7 +8,7 @@
   }
   body {
     @apply bg-base-bg text-white antialiased;
-    font-family: system-ui, -apple-system, sans-serif;
+    font-family: inherit;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
@@ -17,21 +17,23 @@
 
 @layer components {
   .btn-primary {
-    @apply px-6 py-3 bg-base-primary text-white rounded-lg font-medium;
+    @apply px-6 py-4 bg-base-primary text-white rounded-xl font-semibold;
     @apply hover:bg-blue-600 active:scale-95 transition-all;
+    box-shadow: 0 0 18px rgba(0, 82, 255, 0.45);
   }
   
   .btn-secondary {
-    @apply px-6 py-3 bg-base-panel border border-base-border text-white rounded-lg font-medium;
+    @apply px-6 py-4 bg-base-panel border border-base-border text-white rounded-xl font-semibold;
     @apply hover:bg-gray-700 active:scale-95 transition-all;
   }
   
   .panel {
-    @apply bg-base-panel border border-base-border rounded-xl p-4;
+    @apply bg-base-panel border border-base-border rounded-2xl p-4;
+    box-shadow: 0 0 24px rgba(0, 82, 255, 0.12);
   }
   
   .cell {
-    @apply border border-gray-700 transition-all font-bold select-none;
+    @apply border border-gray-700 transition-all font-bold select-none rounded-md flex items-center justify-center;
   }
   
   .cell-hidden {

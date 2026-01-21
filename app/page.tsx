@@ -65,28 +65,19 @@ export default function Home() {
   }, [isConnected, address, setCoins, setScreen]);
 
   return (
-    <div className="min-h-screen bg-base-bg flex items-center justify-center p-4">
-      <div className="w-full max-w-[900px] aspect-video rounded-2xl overflow-hidden bg-base-panel border border-base-border">
-        <div className="relative h-full w-full p-4 sm:p-6">
-          {/* Wallet indicator */}
-          {isConnected && address && (
-            <div className="absolute top-3 right-3 z-50 px-3 py-1 bg-gray-800 border border-gray-700 rounded-lg text-xs">
-              {address.slice(0, 6)}...{address.slice(-4)}
-            </div>
-          )}
-
-          {/* Screen router */}
-          <div className="w-full h-full">
-            {currentScreen === 'connect' && <ConnectScreen />}
-            {currentScreen === 'menu' && <MenuScreen />}
-            {currentScreen === 'difficulty' && <DifficultyScreen />}
-            {currentScreen === 'custom' && <CustomScreen />}
-            {currentScreen === 'shop' && <ShopScreen />}
-            {currentScreen === 'stats' && <StatsScreen />}
-            {currentScreen === 'challenge' && <ChallengeScreen />}
-            {currentScreen === 'playing' && <GameScreen />}
-            {currentScreen === 'ended' && <GameScreen />}
-          </div>
+    <div className="min-h-[100dvh] w-full bg-base-bg text-white pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]">
+      <div className="flex min-h-[100dvh] w-full flex-col px-4 py-4">
+        {/* Screen router */}
+        <div className="w-full flex-1">
+          {currentScreen === 'connect' && <ConnectScreen />}
+          {currentScreen === 'menu' && <MenuScreen />}
+          {currentScreen === 'difficulty' && <DifficultyScreen />}
+          {currentScreen === 'custom' && <CustomScreen />}
+          {currentScreen === 'shop' && <ShopScreen />}
+          {currentScreen === 'stats' && <StatsScreen />}
+          {currentScreen === 'challenge' && <ChallengeScreen />}
+          {currentScreen === 'playing' && <GameScreen />}
+          {currentScreen === 'ended' && <GameScreen />}
         </div>
       </div>
     </div>

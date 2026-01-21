@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Oxanium } from 'next/font/google';
 import './globals.css';
 import { Providers } from '@/components/providers/Providers';
 
@@ -22,6 +23,11 @@ export const metadata: Metadata = {
   },
 };
 
+const oxanium = Oxanium({
+  subsets: ['latin'],
+  display: 'swap',
+});
+
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
@@ -33,8 +39,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="min-h-screen bg-base-bg text-white antialiased">
+    <html lang="en" className={oxanium.className}>
+      <body className="w-full min-h-[100dvh] bg-base-bg text-white antialiased">
         <Providers>{children}</Providers>
       </body>
     </html>
