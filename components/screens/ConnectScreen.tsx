@@ -15,14 +15,14 @@ export default function ConnectScreen() {
       connectors.map((connector) => ({
         id: connector.id,
         name: connector.name,
-        ready: connector.ready,
+        ready: connector.ready ?? true,
         onClick: () => connect({ connector }),
       })),
     [connectors, connect],
   );
 
   return (
-    <div className="flex flex-col items-center justify-center h-full gap-8 px-6">
+      <div className="relative z-10 flex flex-col items-center justify-center h-full gap-8 px-6">
       <div className="text-center">
         <h1 className="text-5xl font-bold mb-4 text-blue-500">
           MINE RONIN
@@ -32,17 +32,25 @@ export default function ConnectScreen() {
 
       {!isConnected && (
         <div className="flex w-full flex-col gap-3">
-          {connectOptions.map((connector) => (
-            <button
-              key={connector.id}
-              type="button"
-              className="btn-primary w-full"
-              onClick={connector.onClick}
-              disabled={!connector.ready || isPending}
-            >
-              {isPending ? 'Connecting...' : `Connect ${connector.name}`}
-            </button>
-          ))}
+          {connectOptions.map((connector) => {
+            const canConnect = connector.ready && !isPending;
+
+            return (
+              <button
+                key={connector.id}
+                type="button"
+                className="btn-primary w-full"
+                onClick={() => {
+                  if (!canConnect) return;
+                  connector.onClick();
+                }}
+                disabled={!canConnect}
+                aria-disabled={!canConnect}
+              >
+                {isPending ? 'Connecting...' : `Connect ${connector.name}`}
+              </button>
+            );
+          })}
         </div>
       )}
 

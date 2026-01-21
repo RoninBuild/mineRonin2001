@@ -42,7 +42,7 @@ export default function Home() {
   }, [isConnected, address]);
 
   return (
-    <div className="min-h-screen bg-base-bg flex items-center justify-center p-4">
+    <div className="min-h-screen bg-base-bg flex items-center justify-center px-4 py-6 sm:px-6">
       <div className="w-full max-w-md h-[80vh] max-h-[800px] bg-base-panel border border-base-border rounded-2xl overflow-hidden relative">
         {/* Wallet indicator */}
         {isConnected && address && (
