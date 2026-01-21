@@ -3,29 +3,13 @@
 import { ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WagmiProvider } from 'wagmi';
-import { createConfig, http } from 'wagmi';
-import { base } from 'viem/chains';
-import { coinbaseWallet, injected } from 'wagmi/connectors';
-
-const config = createConfig({
-  chains: [base],
-  transports: {
-    [base.id]: http(),
-  },
-  connectors: [
-    injected(),
-    coinbaseWallet({
-      appName: 'mineRonin2001',
-    }),
-  ],
-  ssr: true,
-});
+import { wagmiConfig } from '@/lib/wagmi/config';
 
 const queryClient = new QueryClient();
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
-    <WagmiProvider config={config}>
+    <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         {children}
       </QueryClientProvider>

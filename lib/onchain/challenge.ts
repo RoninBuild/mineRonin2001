@@ -1,12 +1,13 @@
 import { readContract, writeContract, waitForTransactionReceipt } from 'wagmi/actions';
 import { parseUnits } from 'viem';
+import { wagmiConfig } from '@/lib/wagmi/config';
 import { CHALLENGE_POOL_ABI } from './contracts';
 
 const POOL_ADDRESS = process.env.NEXT_PUBLIC_CHALLENGE_POOL_ADDRESS as `0x${string}`;
 const USDC_ADDRESS = process.env.NEXT_PUBLIC_USDC_ADDRESS as `0x${string}`;
 
 export async function getCurrentWeek(): Promise<number> {
-  const week = await readContract({
+  const week = await readContract(wagmiConfig, {
     address: POOL_ADDRESS,
     abi: CHALLENGE_POOL_ABI,
     functionName: 'getCurrentWeek',
@@ -16,7 +17,7 @@ export async function getCurrentWeek(): Promise<number> {
 
 export async function checkChallengeEntry(userAddress: string): Promise<boolean> {
   const week = await getCurrentWeek();
-  const hasEntered = await readContract({
+  const hasEntered = await readContract(wagmiConfig, {
     address: POOL_ADDRESS,
     abi: CHALLENGE_POOL_ABI,
     functionName: 'hasEntered',
@@ -30,7 +31,7 @@ export async function enterWeeklyChallenge(userAddress: string): Promise<string 
     // 1. Approve 1 USDC
     const usdcAmount = parseUnits('1', 6);
 
-    const approveHash = await writeContract({
+    const approveHash = await writeContract(wagmiConfig, {
       address: USDC_ADDRESS,
       abi: [
         {
@@ -48,16 +49,16 @@ export async function enterWeeklyChallenge(userAddress: string): Promise<string 
       args: [POOL_ADDRESS, usdcAmount],
     });
 
-    await waitForTransactionReceipt({ hash: approveHash });
+    await waitForTransactionReceipt(wagmiConfig, { hash: approveHash });
 
     // 2. Enter challenge
-    const enterHash = await writeContract({
+    const enterHash = await writeContract(wagmiConfig, {
       address: POOL_ADDRESS,
       abi: CHALLENGE_POOL_ABI,
       functionName: 'enterChallenge',
     });
 
-    await waitForTransactionReceipt({ hash: enterHash });
+    await waitForTransactionReceipt(wagmiConfig, { hash: enterHash });
 
     return enterHash;
   } catch (error) {
