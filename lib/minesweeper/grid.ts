@@ -26,11 +26,18 @@ export function createEmptyGrid(config: GridConfig): Cell[][] {
     );
 }
 
-export function calculateNeighborMines(grid: Cell[][], config: GridConfig): Cell[][] {
+export function calculateNeighborMines(
+  grid: Cell[][],
+  config: GridConfig,
+  mask?: boolean[][]
+): Cell[][] {
   const newGrid = grid.map(row => row.map(cell => ({ ...cell })));
   
   for (let r = 0; r < config.rows; r++) {
     for (let c = 0; c < config.cols; c++) {
+      if (mask && mask[r]?.[c] === false) {
+        continue;
+      }
       if (!newGrid[r][c].isMine) {
         let count = 0;
         for (let dr = -1; dr <= 1; dr++) {
@@ -42,6 +49,7 @@ export function calculateNeighborMines(grid: Cell[][], config: GridConfig): Cell
               nr < config.rows &&
               nc >= 0 &&
               nc < config.cols &&
+              (!mask || mask[nr]?.[nc] !== false) &&
               newGrid[nr][nc].isMine
             ) {
               count++;

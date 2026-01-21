@@ -9,7 +9,8 @@ export function placeMines(
   config: GridConfig,
   firstClickRow?: number,
   firstClickCol?: number,
-  seed?: number
+  seed?: number,
+  mask?: boolean[][]
 ): Cell[][] {
   const newGrid = grid.map(row => row.map(cell => ({ ...cell })));
   
@@ -39,7 +40,8 @@ export function placeMines(
     const col = Math.floor(rng() * config.cols);
     const key = `${row},${col}`;
     
-    if (!newGrid[row][col].isMine && !excludedCells.has(key)) {
+    const isAllowed = mask ? mask[row]?.[col] !== false : true;
+    if (isAllowed && !newGrid[row][col].isMine && !excludedCells.has(key)) {
       newGrid[row][col].isMine = true;
       minesPlaced++;
     }
