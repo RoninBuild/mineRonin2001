@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { RootProvider } from '@/app/rootProvider';
+import { Providers } from '@/components/providers/Providers';
 
 const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ?? 'https://mine-ronin.vercel.app';
@@ -30,7 +30,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <RootProvider>{children}</RootProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
