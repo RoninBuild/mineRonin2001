@@ -14,7 +14,8 @@ export async function getDailyLeaderboard() {
 
   if (error) throw error;
 
-  return data.map((d) => ({ address: d.address, time: d.time_seconds }));
+  const rows = (data as { address: string; time_seconds: number }[] | null) ?? [];
+  return rows.map((d) => ({ address: d.address, time: d.time_seconds }));
 }
 
 export async function getStreakLeaderboard() {
@@ -26,7 +27,8 @@ export async function getStreakLeaderboard() {
 
   if (error) throw error;
 
-  return data.map((d) => ({ address: d.address, streak: d.best_streak }));
+  const rows = (data as { address: string; best_streak: number }[] | null) ?? [];
+  return rows.map((d) => ({ address: d.address, streak: d.best_streak }));
 }
 
 export async function getWeeklyLeaderboard() {
@@ -43,5 +45,6 @@ export async function getWeeklyLeaderboard() {
 
   if (error) throw error;
 
-  return data.map((d) => ({ address: d.address, time: d.best_time }));
+  const rows = (data as { address: string; best_time: number }[] | null) ?? [];
+  return rows.map((d) => ({ address: d.address, time: d.best_time }));
 }

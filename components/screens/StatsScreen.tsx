@@ -19,6 +19,12 @@ type Stats = {
   bestStreak: number;
 };
 
+type GameRow = {
+  won: boolean;
+  difficulty: 'easy' | 'medium' | 'hard' | null;
+  time_seconds: number;
+};
+
 export default function StatsScreen() {
   const { address } = useAccount();
   const { setScreen } = useAppStore();
@@ -48,14 +54,15 @@ export default function StatsScreen() {
         .eq('address', address.toLowerCase())
         .eq('mode', 'casual');
 
-      const gamesPlayed = games?.length || 0;
-      const gamesWon = games?.filter((g) => g.won).length || 0;
+      const gamesData = (games as GameRow[] | null) ?? [];
+      const gamesPlayed = gamesData.length;
+      const gamesWon = gamesData.filter((g) => g.won).length;
 
       // Get best times per difficulty
       const bestTimes: Stats['bestTimes'] = { easy: null, medium: null, hard: null };
 
       for (const diff of ['easy', 'medium', 'hard'] as const) {
-        const wonGames = games?.filter((g) => g.won && g.difficulty === diff) || [];
+        const wonGames = gamesData.filter((g) => g.won && g.difficulty === diff);
         if (wonGames.length > 0) {
           bestTimes[diff] = Math.min(...wonGames.map((g) => g.time_seconds));
         }
