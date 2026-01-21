@@ -10,10 +10,8 @@ export default function FlagModeToggle() {
   return (
     <button
       onClick={toggleFlagMode}
-      className={`px-6 py-3 rounded-lg font-medium transition-all ${
-        flagMode
-          ? 'bg-blue-600 text-white border-2 border-blue-400'
-          : 'bg-gray-800 text-gray-300 border border-gray-700'
+      className={`text-sm ${
+        flagMode ? 'btn-primary' : 'btn-secondary'
       }`}
     >
       {flagMode ? '🚩 FLAG MODE ON' : 'TAP MODE'}

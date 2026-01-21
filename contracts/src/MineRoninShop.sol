@@ -13,18 +13,20 @@ contract MineRoninShop is Ownable {
     IERC20 public immutable usdc;
     SkinsNFT public immutable skinsNFT;
     address public treasury;
-    
-    // Skin catalog: tier => (category => names[])
-    mapping(uint8 => mapping(string => string[])) public catalog;
-    
-    event SkinPurchased(
-        address indexed buyer,
-        uint256 indexed tokenId,
-        string category,
-        uint8 tier,
-        uint256 usdcAmount
+
+    mapping(address => mapping(uint256 => bool)) public ownedFieldSkins;
+    mapping(address => mapping(uint256 => bool)) public ownedFlags;
+
+    mapping(uint256 => uint256) public fieldPrices;
+    mapping(uint256 => uint256) public flagPrices;
+
+    event Purchased(
+        address indexed user,
+        uint8 indexed itemType,
+        uint256 indexed id,
+        uint256 price
     );
-    
+
     constructor(
         address _usdc,
         address _skinsNFT,
@@ -33,76 +35,56 @@ contract MineRoninShop is Ownable {
         usdc = IERC20(_usdc);
         skinsNFT = SkinsNFT(_skinsNFT);
         treasury = _treasury;
-        
-        // Initialize catalog
-        _initializeCatalog();
+
+        _initializePrices();
     }
-    
-    function _initializeCatalog() private {
-        // Tier 1 skins
-        catalog[1]["field"] = ["Classic Dark", "Minimal Grid"];
-        catalog[1]["flag"] = ["Base Flag", "Simple Mark"];
-        
-        // Tier 5 skins
-        catalog[5]["field"] = ["Neon Grid", "Carbon Fiber"];
-        catalog[5]["flag"] = ["Ronin Mark", "Elite Flag"];
-        
-        // Tier 10 skins
-        catalog[10]["field"] = ["Cyber Matrix", "Holographic"];
-        catalog[10]["flag"] = ["Elite Emblem", "Legendary Mark"];
+
+    function _initializePrices() private {
+        fieldPrices[1] = 0;
+        fieldPrices[2] = 5e6;
+        fieldPrices[3] = 10e6;
+
+        flagPrices[1] = 0;
+        flagPrices[2] = 5e6;
+        flagPrices[3] = 10e6;
     }
-    
+
     function updateTreasury(address _treasury) external onlyOwner {
         treasury = _treasury;
     }
-    
-    function addSkinToCatalog(
-        uint8 tier,
-        string memory category,
-        string memory name
-    ) external onlyOwner {
-        catalog[tier][category].push(name);
+
+    function setFieldPrice(uint256 id, uint256 price) external onlyOwner {
+        fieldPrices[id] = price;
     }
-    
-    function purchaseSkin(
-        string memory category,
-        uint8 tier,
-        uint256 skinIndex
-    ) external returns (uint256) {
+
+    function setFlagPrice(uint256 id, uint256 price) external onlyOwner {
+        flagPrices[id] = price;
+    }
+
+    function buyFieldSkin(uint256 id) external {
+        require(!ownedFieldSkins[msg.sender][id], "Already owned");
+        uint256 price = fieldPrices[id];
+        _chargeUSDC(price);
+        ownedFieldSkins[msg.sender][id] = true;
+        emit Purchased(msg.sender, 0, id, price);
+    }
+
+    function buyFlag(uint256 id) external {
+        require(!ownedFlags[msg.sender][id], "Already owned");
+        uint256 price = flagPrices[id];
+        _chargeUSDC(price);
+        ownedFlags[msg.sender][id] = true;
+        emit Purchased(msg.sender, 1, id, price);
+    }
+
+    function _chargeUSDC(uint256 price) private {
+        if (price == 0) {
+            return;
+        }
+
         require(
-            tier == 1 || tier == 5 || tier == 10,
-            "Invalid tier"
-        );
-        
-        string[] memory skins = catalog[tier][category];
-        require(skinIndex < skins.length, "Invalid skin index");
-        
-        uint256 usdcAmount = uint256(tier) * 1e6; // USDC has 6 decimals
-        
-        // Transfer USDC from buyer to treasury
-        require(
-            usdc.transferFrom(msg.sender, treasury, usdcAmount),
+            usdc.transferFrom(msg.sender, treasury, price),
             "USDC transfer failed"
         );
-        
-        // Mint NFT to buyer
-        uint256 tokenId = skinsNFT.mint(
-            msg.sender,
-            category,
-            tier,
-            skins[skinIndex]
-        );
-        
-        emit SkinPurchased(msg.sender, tokenId, category, tier, usdcAmount);
-        
-        return tokenId;
-    }
-    
-    function getCatalogSkins(uint8 tier, string memory category)
-        external
-        view
-        returns (string[] memory)
-    {
-        return catalog[tier][category];
     }
 }

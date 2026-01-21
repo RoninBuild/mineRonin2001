@@ -24,6 +24,8 @@ type GameStore = {
   isPlaying: boolean;
   flagMode: boolean;
   hasFirstClick: boolean;
+  moves: number;
+  currentGameId: number | null;
   
   // Actions
   setDifficulty: (diff: Difficulty) => void;
@@ -32,6 +34,8 @@ type GameStore = {
   setGrid: (grid: Cell[][]) => void;
   startGame: () => void;
   recordFirstClick: () => void;
+  incrementMoves: () => void;
+  setCurrentGameId: (gameId: number | null) => void;
   endGame: (won: boolean) => void;
   toggleFlagMode: () => void;
   resetGame: () => void;
@@ -49,6 +53,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   isPlaying: false,
   flagMode: false,
   hasFirstClick: false,
+  moves: 0,
+  currentGameId: null,
   
   setDifficulty: (diff) => set({ difficulty: diff }),
   setMode: (mode) => set({ mode }),
@@ -66,12 +72,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       isPlaying: true,
       hasFirstClick: false,
       flagMode: false,
+      moves: 0,
     }),
   recordFirstClick: () =>
     set((state) => ({
       firstClickTime: state.firstClickTime === 0 ? Date.now() : state.firstClickTime,
       hasFirstClick: true,
     })),
+  incrementMoves: () => set((state) => ({ moves: state.moves + 1 })),
+  setCurrentGameId: (gameId) => set({ currentGameId: gameId }),
   endGame: (won) =>
     set({
       gameEndTime: Date.now(),
@@ -89,5 +98,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       isPlaying: false,
       flagMode: false,
       hasFirstClick: false,
+      moves: 0,
+      currentGameId: null,
     }),
 }));
