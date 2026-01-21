@@ -24,6 +24,13 @@ export const SHOP_ABI = [
 
 export const CHALLENGE_POOL_ABI = [
   {
+    name: 'getCurrentWeek',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint256' }],
+  },
+  {
     name: 'enterChallenge',
     type: 'function',
     stateMutability: 'nonpayable',
