@@ -2,6 +2,9 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { RootProvider } from '@/app/rootProvider';
 
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL ?? 'https://mine-ronin.vercel.app';
+
 export const metadata: Metadata = {
   title: 'Mine Ronin',
   description: 'Minesweeper on Base',
@@ -12,10 +15,10 @@ export const metadata: Metadata = {
   },
   other: {
     'fc:frame': 'vNext',
-    'fc:frame:image': `${process.env.NEXT_PUBLIC_APP_URL}/og-image.png`,
+    'fc:frame:image': `${APP_URL}/og-image.png`,
     'fc:frame:button:1': 'Play Now',
     'fc:frame:button:1:action': 'link',
-    'fc:frame:button:1:target': process.env.NEXT_PUBLIC_APP_URL,
+    'fc:frame:button:1:target': APP_URL,
   },
 };
 
