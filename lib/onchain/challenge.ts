@@ -6,13 +6,13 @@ import { CHALLENGE_POOL_ABI } from './contracts';
 const POOL_ADDRESS = process.env.NEXT_PUBLIC_CHALLENGE_POOL_ADDRESS as `0x${string}`;
 const USDC_ADDRESS = process.env.NEXT_PUBLIC_USDC_ADDRESS as `0x${string}`;
 
-export async function getCurrentWeek(): Promise<number> {
+export async function getCurrentWeek(): Promise<bigint> {
   const week = await readContract(wagmiConfig, {
     address: POOL_ADDRESS,
     abi: CHALLENGE_POOL_ABI,
     functionName: 'getCurrentWeek',
   });
-  return Number(week);
+  return week;
 }
 
 export async function checkChallengeEntry(userAddress: string): Promise<boolean> {
@@ -21,7 +21,7 @@ export async function checkChallengeEntry(userAddress: string): Promise<boolean>
     address: POOL_ADDRESS,
     abi: CHALLENGE_POOL_ABI,
     functionName: 'hasEntered',
-    args: [userAddress as `0x${string}`, BigInt(week)],
+    args: [userAddress as `0x${string}`, week],
   });
   return hasEntered;
 }
