@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { Providers } from '@/components/providers/Providers';
+import { RootProvider } from '@/app/rootProvider';
 
 export const metadata: Metadata = {
   title: 'Mine Ronin',
@@ -27,7 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <Providers>{children}</Providers>
+        <RootProvider>{children}</RootProvider>
       </body>
     </html>
   );
