@@ -37,11 +37,14 @@ export async function purchaseSkinWithUSDC(
     await waitForTransactionReceipt(wagmiConfig, { hash: approveHash });
 
     // 2. Purchase skin
+    const tierBI = BigInt(Math.floor(tier));
+    const skinIndexBI = BigInt(Math.floor(skinIndex));
+
     const purchaseHash = await writeContract(wagmiConfig, {
       address: SHOP_ADDRESS,
       abi: SHOP_ABI,
       functionName: 'purchaseSkin',
-      args: [category, tier, skinIndex],
+      args: [category, tierBI, skinIndexBI],
     });
 
     await waitForTransactionReceipt(wagmiConfig, { hash: purchaseHash });
