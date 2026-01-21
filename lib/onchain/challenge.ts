@@ -46,7 +46,8 @@ export async function enterWeeklyChallenge(userAddress: string): Promise<string 
         },
       ],
       functionName: 'approve',
-      args: [POOL_ADDRESS, usdcAmount],
+      // TEMP: contracts/ABI not final — bypass strict wagmi arg typing for Vercel build
+      args: [POOL_ADDRESS, usdcAmount] as any,
     });
 
     await waitForTransactionReceipt(wagmiConfig, { hash: approveHash });
