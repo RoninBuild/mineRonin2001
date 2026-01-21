@@ -9,14 +9,33 @@ const isValidUrl = (url?: string) =>
 export const isSupabaseConfigured =
   isValidUrl(supabaseUrl) && Boolean(supabaseAnonKey);
 
+type StubResult = Promise<{ data: null; error: null }>;
+
+const createStubQueryBuilder = (): any => {
+  const result: StubResult = Promise.resolve({ data: null, error: null });
+  const builder: any = {
+    select: () => builder,
+    eq: () => builder,
+    order: () => builder,
+    limit: () => builder,
+    single: () => result,
+    maybeSingle: () => result,
+    insert: () => result,
+    upsert: () => result,
+    then: (onFulfilled: any, onRejected: any) => result.then(onFulfilled, onRejected),
+  };
+
+  return builder;
+};
+
 const createStubClient = () =>
   ({
     from() {
-      throw new Error('Supabase client is not configured.');
+      return createStubQueryBuilder();
     },
-  }) as ReturnType<typeof createClient>;
+  }) as any;
 
-export const supabase = isSupabaseConfigured
+export const supabase: any = isSupabaseConfigured
   ? createClient(supabaseUrl as string, supabaseAnonKey as string)
   : createStubClient();
 
