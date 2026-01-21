@@ -10,9 +10,11 @@ import { logEvent } from '@/lib/db/analytics';
 import Button from '@/components/ui/Button';
 
 type ChallengeMode = 'daily' | 'streak' | 'weekly';
-type LeaderboardEntry =
-  | { address: string; time: number }
-  | { address: string; streak: number };
+type LeaderboardEntry = {
+  address: string;
+  time?: number;
+  streak?: number;
+};
 
 export default function ChallengeScreen() {
   const { address } = useAccount();
@@ -164,7 +166,9 @@ export default function ChallengeScreen() {
                 </span>
               </div>
               <span className="text-yellow-400 font-bold">
-                {selectedMode === 'streak' ? `${entry.streak} 🔥` : `${entry.time}s`}
+                {selectedMode === 'streak'
+                  ? `${entry.streak ?? 0} 🔥`
+                  : `${entry.time ?? 0}s`}
               </span>
             </div>
           ))}

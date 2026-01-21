@@ -1,5 +1,6 @@
 import { writeContract, waitForTransactionReceipt } from 'wagmi/actions';
 import { parseUnits } from 'viem';
+import { wagmiConfig } from '@/lib/wagmi/config';
 import { SHOP_ABI } from './contracts';
 
 const SHOP_ADDRESS = process.env.NEXT_PUBLIC_SHOP_ADDRESS as `0x${string}`;
@@ -15,7 +16,7 @@ export async function purchaseSkinWithUSDC(
     // 1. Approve USDC
     const usdcAmount = parseUnits(tier.toString(), 6); // USDC has 6 decimals
 
-    const approveHash = await writeContract({
+    const approveHash = await writeContract(wagmiConfig, {
       address: USDC_ADDRESS,
       abi: [
         {
@@ -33,17 +34,17 @@ export async function purchaseSkinWithUSDC(
       args: [SHOP_ADDRESS, usdcAmount],
     });
 
-    await waitForTransactionReceipt({ hash: approveHash });
+    await waitForTransactionReceipt(wagmiConfig, { hash: approveHash });
 
     // 2. Purchase skin
-    const purchaseHash = await writeContract({
+    const purchaseHash = await writeContract(wagmiConfig, {
       address: SHOP_ADDRESS,
       abi: SHOP_ABI,
       functionName: 'purchaseSkin',
       args: [category, tier, skinIndex],
     });
 
-    await waitForTransactionReceipt({ hash: purchaseHash });
+    await waitForTransactionReceipt(wagmiConfig, { hash: purchaseHash });
 
     return purchaseHash;
   } catch (error) {
