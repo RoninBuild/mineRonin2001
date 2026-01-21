@@ -1,11 +1,17 @@
 'use client';
 
 import { useMemo } from 'react';
-import { useAccount, useConnect, useDisconnect } from 'wagmi';
+import {
+  useAccount,
+  useChainId,
+  useConnect,
+  useDisconnect,
+} from 'wagmi';
 import { base } from 'viem/chains';
 
 export default function ConnectScreen() {
-  const { isConnected, chainId } = useAccount();
+  const { isConnected } = useAccount();
+  const chainId = useChainId();
   const { connectors, connect, isPending } = useConnect();
   const { disconnect } = useDisconnect();
 
@@ -22,7 +28,7 @@ export default function ConnectScreen() {
   );
 
   return (
-      <div className="relative z-10 flex flex-col items-center justify-center h-full gap-8 px-6">
+    <div className="relative z-10 flex flex-col items-center justify-center h-full gap-8 px-6">
       <div className="text-center">
         <h1 className="text-5xl font-bold mb-4 text-blue-500">
           MINE RONIN
