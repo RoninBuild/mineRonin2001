@@ -10,6 +10,9 @@ import { logEvent } from '@/lib/db/analytics';
 import Button from '@/components/ui/Button';
 
 type ChallengeMode = 'daily' | 'streak' | 'weekly';
+type LeaderboardEntry =
+  | { address: string; time: number }
+  | { address: string; streak: number };
 
 export default function ChallengeScreen() {
   const { address } = useAccount();
@@ -17,7 +20,7 @@ export default function ChallengeScreen() {
   const { setMode, startGame } = useGameStore();
 
   const [selectedMode, setSelectedMode] = useState<ChallengeMode>('daily');
-  const [leaderboard, setLeaderboard] = useState<any[]>([]);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [hasEnteredWeekly, setHasEnteredWeekly] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -33,7 +36,7 @@ export default function ChallengeScreen() {
 
   const loadLeaderboard = async () => {
     try {
-      let data = [];
+      let data: LeaderboardEntry[] = [];
       if (selectedMode === 'daily') {
         data = await getDailyLeaderboard();
       } else if (selectedMode === 'streak') {

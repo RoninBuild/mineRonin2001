@@ -5,7 +5,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WagmiProvider } from 'wagmi';
 import { createConfig, http } from 'wagmi';
 import { base } from 'viem/chains';
-import { coinbaseWallet, injected } from 'wagmi/connectors';
+import { coinbaseWallet } from 'wagmi/connectors/coinbaseWallet';
+import { injected } from 'wagmi/connectors/injected';
 
 const config = createConfig({
   chains: [base],
@@ -15,7 +16,7 @@ const config = createConfig({
   connectors: [
     injected(),
     coinbaseWallet({
-      appName: 'Mine Ronin',
+      appName: 'mineRonin2001',
     }),
   ],
   ssr: true,
