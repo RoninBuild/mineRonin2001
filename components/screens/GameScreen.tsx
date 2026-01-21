@@ -102,7 +102,7 @@ export default function GameScreen() {
           difficulty,
           timeSeconds,
           won: result.won,
-        }).then((savedResult) => {
+        }).then((_savedResult: unknown) => {
           if (result.won && difficulty !== 'custom') {
             const coinsEarned = calculateCoinReward(difficulty, timeSeconds);
             addCoins(address, coinsEarned);

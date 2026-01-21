@@ -11,6 +11,7 @@ export const isSupabaseConfigured =
 
 type StubResult = Promise<{ data: null; error: null }>;
 
+// TEMP: stub uses any to satisfy varying Supabase query builder shapes.
 const createStubQueryBuilder = (): any => {
   const result: StubResult = Promise.resolve({ data: null, error: null });
   const builder: any = {
