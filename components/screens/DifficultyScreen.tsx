@@ -1,16 +1,54 @@
 'use client';
 
+import { useState } from 'react';
 import { useAppStore } from '@/store/app-store';
 import { useGameStore, DIFFICULTY_CONFIGS } from '@/store/game-store';
 import Button from '@/components/ui/Button';
+import { startOnchainGame } from '@/lib/onchain/game';
+import { base } from 'viem/chains';
+import { useChainId } from 'wagmi';
 
 export default function DifficultyScreen() {
   const { setScreen } = useAppStore();
-  const { difficulty, setDifficulty, startGame } = useGameStore();
+  const { difficulty, setDifficulty, startGame, setCurrentGameId } = useGameStore();
+  const chainId = useChainId();
+  const [isStarting, setIsStarting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleStart = () => {
-    startGame();
-    setScreen('playing');
+  const handleStart = async () => {
+    setError(null);
+
+    if (chainId !== base.id) {
+      setError('Switch to Base mainnet to start.');
+      return;
+    }
+
+    setIsStarting(true);
+
+    try {
+      const difficultyMap: Record<typeof difficulty, number> = {
+        easy: 0,
+        medium: 1,
+        hard: 2,
+        custom: 3,
+      };
+
+      const { gameId } = await startOnchainGame(difficultyMap[difficulty]);
+      if (gameId === null) {
+        setError('Unable to read game ID from chain.');
+        setIsStarting(false);
+        return;
+      }
+
+      setCurrentGameId(gameId);
+      startGame();
+      setScreen('playing');
+    } catch (err) {
+      console.error('startGame failed', err);
+      setError('Start failed. Please try again.');
+    } finally {
+      setIsStarting(false);
+    }
   };
 
   return (
@@ -47,9 +85,11 @@ export default function DifficultyScreen() {
         </button>
       </div>
 
+      {error && <div className="text-sm text-red-400">{error}</div>}
+
       <div className="flex gap-3">
-        <Button onClick={handleStart} variant="primary">
-          START GAME
+        <Button onClick={handleStart} variant="primary" disabled={isStarting}>
+          {isStarting ? 'STARTING…' : 'START GAME'}
         </Button>
         <Button onClick={() => setScreen('menu')} variant="secondary">
           BACK
