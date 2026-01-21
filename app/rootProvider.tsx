@@ -10,6 +10,11 @@ import { coinbaseWallet } from '@wagmi/connectors/coinbaseWallet';
 import { injected } from '@wagmi/connectors/injected';
 import '@coinbase/onchainkit/styles.css';
 
+const apiKey = process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY;
+if (!apiKey) {
+  throw new Error('NEXT_PUBLIC_ONCHAINKIT_API_KEY is required');
+}
+
 const queryClient = new QueryClient();
 const config = createConfig({
   chains: [base],
@@ -30,12 +35,8 @@ export function RootProvider({ children }: { children: ReactNode }) {
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <OnchainKitProvider
-          apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY}
+          apiKey={apiKey}
           chain={base}
-          config={{
-            appearance: { mode: 'auto' },
-            wallet: { display: 'modal', preference: 'all' },
-          }}
         >
           {children}
         </OnchainKitProvider>
