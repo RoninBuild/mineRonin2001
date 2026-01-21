@@ -1,4 +1,5 @@
 import { readContract } from 'wagmi/actions';
+import { wagmiConfig } from '@/lib/wagmi/config';
 
 const SKINS_NFT_ADDRESS = process.env.NEXT_PUBLIC_SKINS_NFT_ADDRESS as `0x${string}`;
 
@@ -31,7 +32,7 @@ const SKINS_NFT_ABI = [
 
 export async function getOwnedSkins(address: string): Promise<number[]> {
   try {
-    const tokenIds = await readContract({
+    const tokenIds = await readContract(wagmiConfig, {
       address: SKINS_NFT_ADDRESS,
       abi: SKINS_NFT_ABI,
       functionName: 'tokensOfOwner',
@@ -47,7 +48,7 @@ export async function getOwnedSkins(address: string): Promise<number[]> {
 
 export async function getSkinMetadata(tokenId: number) {
   try {
-    const metadata = await readContract({
+    const metadata = await readContract(wagmiConfig, {
       address: SKINS_NFT_ADDRESS,
       abi: SKINS_NFT_ABI,
       functionName: 'getSkin',
