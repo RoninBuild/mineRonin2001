@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { logEvent } from '@/lib/db/analytics';
+import { isSupabaseConfigured } from '@/lib/db/client';
 
 export async function POST(req: NextRequest) {
   try {
+    if (!isSupabaseConfigured) {
+      return NextResponse.json({ ok: false, disabled: true }, { status: 200 });
+    }
+
     const { eventType, address, metadata } = await req.json();
 
     if (!eventType) {

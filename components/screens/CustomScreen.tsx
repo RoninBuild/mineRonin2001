@@ -1,5 +1,6 @@
 'use client';
 
+import type { ChangeEvent } from 'react';
 import { useAppStore } from '@/store/app-store';
 import { useGameStore } from '@/store/game-store';
 import Button from '@/components/ui/Button';
@@ -31,7 +32,7 @@ export default function CustomScreen() {
             min="5"
             max="30"
             value={customConfig.rows}
-            onChange={(e) =>
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
               setCustomConfig({ rows: Math.max(5, Math.min(30, parseInt(e.target.value) || 10)) })
             }
             className="w-full bg-gray-900 border border-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:border-blue-500"
@@ -47,7 +48,7 @@ export default function CustomScreen() {
             min="5"
             max="30"
             value={customConfig.cols}
-            onChange={(e) =>
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
               setCustomConfig({ cols: Math.max(5, Math.min(30, parseInt(e.target.value) || 10)) })
             }
             className="w-full bg-gray-900 border border-gray-700 text-white px-4 py-2 rounded-lg focus:outline-none focus:border-blue-500"
@@ -63,7 +64,7 @@ export default function CustomScreen() {
             min="1"
             max={maxMines}
             value={customConfig.mines}
-            onChange={(e) =>
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
               setCustomConfig({
                 mines: Math.max(1, Math.min(maxMines, parseInt(e.target.value) || 15)),
               })

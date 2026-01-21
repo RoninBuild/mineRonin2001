@@ -57,7 +57,7 @@ export async function getSkinMetadata(tokenId: number) {
 
     return {
       category: metadata.category,
-      tier: metadata.tier,
+      tier: Number(metadata.tier),
       name: metadata.name,
     };
   } catch (error) {

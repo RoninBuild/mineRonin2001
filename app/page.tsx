@@ -28,7 +28,7 @@ export default function Home() {
   useEffect(() => {
     if (isConnected && address) {
       // Load profile
-      getOrCreateProfile(address).then((profile) => {
+      getOrCreateProfile(address).then((profile: { coins: number }) => {
         setCoins(profile.coins);
         if (currentScreen === 'connect') {
           setScreen('menu');
