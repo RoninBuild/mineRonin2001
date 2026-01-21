@@ -4,7 +4,7 @@ import { wagmiConfig } from '@/lib/wagmi/config';
 import { GAME_ADDRESS } from '@/lib/onchain/addresses';
 import { RONIN_MINES_GAME_ABI } from '@/lib/onchain/abi/roninMinesGame';
 
-const GAME_ADDRESS_TYPED = GAME_ADDRESS as `0x${string}`;
+const GAME_ADDRESS_TYPED = GAME_ADDRESS;
 
 const getGameStartedIdFromReceipt = (logs: Parameters<typeof parseEventLogs>[0]['logs']) => {
   const parsedLogs = parseEventLogs({

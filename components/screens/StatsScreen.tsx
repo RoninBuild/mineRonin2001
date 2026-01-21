@@ -12,6 +12,20 @@ export default function StatsScreen() {
   const gamesPlayed = results.length;
   const gamesWon = results.filter((result) => result.won).length;
   const winRate = gamesPlayed > 0 ? Math.round((gamesWon / gamesPlayed) * 100) : 0;
+  const chartResults = results.slice(0, 20).reverse();
+  const maxTime = Math.max(1, ...chartResults.map((result) => result.timeSeconds));
+  const chartWidth = 260;
+  const chartHeight = 80;
+  const chartPoints = chartResults
+    .map((result, index) => {
+      const x =
+        chartResults.length > 1
+          ? (index / (chartResults.length - 1)) * chartWidth
+          : chartWidth / 2;
+      const y = chartHeight - (result.timeSeconds / maxTime) * chartHeight;
+      return `${x},${y}`;
+    })
+    .join(' ');
 
   return (
     <div className="flex flex-col items-center h-full gap-4 py-2 overflow-y-auto">
@@ -72,6 +86,42 @@ export default function StatsScreen() {
                 </div>
               ))}
             </div>
+          )}
+        </Panel>
+
+        <Panel>
+          <div className="text-purple-400 font-medium mb-3">Recent Times</div>
+          {chartResults.length === 0 ? (
+            <div className="text-sm text-gray-500">No data yet.</div>
+          ) : (
+            <svg
+              width={chartWidth}
+              height={chartHeight}
+              viewBox={`0 0 ${chartWidth} ${chartHeight}`}
+            >
+              <polyline
+                fill="none"
+                stroke="#60a5fa"
+                strokeWidth="2"
+                points={chartPoints}
+              />
+              {chartResults.map((result, index) => {
+                const x =
+                  chartResults.length > 1
+                    ? (index / (chartResults.length - 1)) * chartWidth
+                    : chartWidth / 2;
+                const y = chartHeight - (result.timeSeconds / maxTime) * chartHeight;
+                return (
+                  <circle
+                    key={result.id}
+                    cx={x}
+                    cy={y}
+                    r="2"
+                    fill={result.won ? '#34d399' : '#f87171'}
+                  />
+                );
+              })}
+            </svg>
           )}
         </Panel>
       </div>

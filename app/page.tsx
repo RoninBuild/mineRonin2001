@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAccount, useChainId, useSwitchChain } from 'wagmi';
 import { useAppStore } from '@/store/app-store';
 import { getOrCreateProfile } from '@/lib/db/profiles';
@@ -20,8 +20,9 @@ import GameScreen from '@/components/screens/GameScreen';
 export default function Home() {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
-  const { switchChain } = useSwitchChain();
+  const { switchChainAsync } = useSwitchChain();
   const { currentScreen, setScreen, setCoins } = useAppStore();
+  const [switchError, setSwitchError] = useState(false);
 
   useEffect(() => {
     // Log app open
@@ -35,20 +36,23 @@ export default function Home() {
   }, [isConnected, address, chainId]);
 
   useEffect(() => {
-    if (!isConnected || !address || chainId === base.id || !switchChain) {
+    if (!isConnected || !address || chainId === base.id || !switchChainAsync) {
+      setSwitchError(false);
       return;
     }
 
     const attemptSwitch = async () => {
       try {
-        await switchChain({ chainId: base.id });
+        await switchChainAsync({ chainId: base.id });
+        setSwitchError(false);
       } catch (error) {
         console.warn('switchChain failed', error);
+        setSwitchError(true);
       }
     };
 
     void attemptSwitch();
-  }, [isConnected, address, chainId, switchChain]);
+  }, [isConnected, address, chainId, switchChainAsync]);
 
   useEffect(() => {
     if (isConnected && address) {
@@ -67,6 +71,34 @@ export default function Home() {
   return (
     <div className="min-h-[100dvh] w-full bg-base-bg text-white pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]">
       <div className="flex min-h-[100dvh] w-full flex-col px-4 py-4">
+        {isConnected && chainId !== base.id && (
+          <div className="mb-4 rounded-xl border border-yellow-500/40 bg-yellow-500/10 p-3 text-sm text-yellow-200">
+            <div className="flex items-center justify-between gap-3">
+              <span>Base mainnet only.</span>
+              <button
+                type="button"
+                onClick={async () => {
+                  if (!switchChainAsync) return;
+                  try {
+                    await switchChainAsync({ chainId: base.id });
+                    setSwitchError(false);
+                  } catch (error) {
+                    console.warn('switchChain failed', error);
+                    setSwitchError(true);
+                  }
+                }}
+                className="btn-secondary px-3 py-2 text-xs"
+              >
+                Retry switch
+              </button>
+            </div>
+            {switchError && (
+              <div className="mt-2 text-xs text-yellow-300">
+                Switch rejected. Please confirm in your wallet.
+              </div>
+            )}
+          </div>
+        )}
         {/* Screen router */}
         <div className="w-full flex-1">
           {currentScreen === 'connect' && <ConnectScreen />}

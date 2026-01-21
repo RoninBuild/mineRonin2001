@@ -12,6 +12,7 @@ export default function DifficultyScreen() {
   const { setScreen } = useAppStore();
   const { difficulty, setDifficulty, startGame, setCurrentGameId } = useGameStore();
   const chainId = useChainId();
+  const isOnBase = chainId === base.id;
   const [isStarting, setIsStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -88,7 +89,7 @@ export default function DifficultyScreen() {
       {error && <div className="text-sm text-red-400">{error}</div>}
 
       <div className="flex gap-3">
-        <Button onClick={handleStart} variant="primary" disabled={isStarting}>
+        <Button onClick={handleStart} variant="primary" disabled={!isOnBase || isStarting}>
           {isStarting ? 'STARTING…' : 'START GAME'}
         </Button>
         <Button onClick={() => setScreen('menu')} variant="secondary">
