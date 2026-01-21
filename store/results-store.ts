@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+import { noopStorage } from '@/lib/utils/noopStorage';
 
 export type GameResult = {
   id: string;
@@ -53,7 +54,7 @@ export const useResultsStore = create<ResultsState>()(
     {
       name: 'mine-ronin-results',
       storage: createJSONStorage(() =>
-        typeof window !== 'undefined' ? localStorage : undefined,
+        typeof window !== 'undefined' ? localStorage : noopStorage,
       ),
     },
   ),
