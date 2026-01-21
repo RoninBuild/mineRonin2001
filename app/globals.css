@@ -17,13 +17,13 @@
 
 @layer components {
   .btn-primary {
-    @apply px-6 py-3 bg-base-primary text-white rounded-lg font-medium \
-           hover:bg-blue-600 active:scale-95 transition-all;
+    @apply px-6 py-3 bg-base-primary text-white rounded-lg font-medium;
+    @apply hover:bg-blue-600 active:scale-95 transition-all;
   }
   
   .btn-secondary {
-    @apply px-6 py-3 bg-base-panel border border-base-border text-white \
-           rounded-lg font-medium hover:bg-gray-700 active:scale-95 transition-all;
+    @apply px-6 py-3 bg-base-panel border border-base-border text-white rounded-lg font-medium;
+    @apply hover:bg-gray-700 active:scale-95 transition-all;
   }
   
   .panel {
