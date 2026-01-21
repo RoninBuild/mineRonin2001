@@ -1,24 +1,21 @@
 export const SHOP_ABI = [
   {
-    name: 'purchaseSkin',
+    name: 'buyFieldSkin',
     type: 'function',
     stateMutability: 'nonpayable',
     inputs: [
-      { name: 'category', type: 'string' },
-      { name: 'tier', type: 'uint8' },
-      { name: 'skinIndex', type: 'uint256' },
+      { name: 'id', type: 'uint256' },
     ],
-    outputs: [{ name: '', type: 'uint256' }],
+    outputs: [],
   },
   {
-    name: 'getCatalogSkins',
+    name: 'buyFlag',
     type: 'function',
-    stateMutability: 'view',
+    stateMutability: 'nonpayable',
     inputs: [
-      { name: 'tier', type: 'uint8' },
-      { name: 'category', type: 'string' },
+      { name: 'id', type: 'uint256' },
     ],
-    outputs: [{ name: '', type: 'string[]' }],
+    outputs: [],
   },
 ] as const;
 
