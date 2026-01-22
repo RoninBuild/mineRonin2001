@@ -33,11 +33,6 @@ export const metadata: Metadata = {
   },
 };
 
-const oxanium = Oxanium({
-  subsets: ['latin'],
-  display: 'swap',
-});
-
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
@@ -49,7 +44,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={oxanium.className}>
+    <html lang="en">
       <body className="w-full min-h-[100dvh] bg-base-bg text-white antialiased">
         <Providers>{children}</Providers>
       </body>

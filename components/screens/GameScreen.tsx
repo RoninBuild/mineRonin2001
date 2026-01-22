@@ -177,7 +177,16 @@ export default function GameScreen() {
     };
 
     void submitFinish();
-  }, [showEndModal, currentGameId, isOnBase, firstClickTime, gameWon, moves, setCurrentGameId]);
+  }, [
+    showEndModal,
+    mode,
+    currentGameId,
+    isOnBase,
+    firstClickTime,
+    gameWon,
+    moves,
+    setCurrentGameId,
+  ]);
 
   const handleCellClick = (row: number, col: number) => {
     if (!isPlaying || grid[row][col].isFlagged) return;
