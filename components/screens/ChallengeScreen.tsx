@@ -7,19 +7,46 @@ import { useAppStore } from '@/store/app-store';
 import { useGameStore } from '@/store/game-store';
 import { CHALLENGE_LEVELS } from '@/lib/challenge/levels';
 import Button from '@/components/ui/Button';
+import { startOnchainGame } from '@/lib/onchain/game';
 
 export default function ChallengeScreen() {
   const { setScreen } = useAppStore();
-  const { setMode, startGame, setChallengeLevelId } = useGameStore();
+  const { setMode, startGame, setChallengeLevelId, setCurrentGameId } = useGameStore();
   const [selectedLevel, setSelectedLevel] = useState(1);
   const chainId = useChainId();
   const isOnBase = chainId === base.id;
+  const [isStarting, setIsStarting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleStart = () => {
-    setMode('challenge');
-    setChallengeLevelId(selectedLevel);
-    startGame();
-    setScreen('playing');
+  const handleStart = async () => {
+    setError(null);
+
+    if (chainId !== base.id) {
+      setError('Switch to Base mainnet to start.');
+      return;
+    }
+
+    setIsStarting(true);
+
+    try {
+      const { gameId } = await startOnchainGame(3);
+      if (gameId === null) {
+        setError('Unable to read game ID from chain.');
+        setIsStarting(false);
+        return;
+      }
+
+      setCurrentGameId(gameId);
+      setMode('challenge');
+      setChallengeLevelId(selectedLevel);
+      startGame();
+      setScreen('playing');
+    } catch (err) {
+      console.error('startGame failed', err);
+      setError('Start failed. Please try again.');
+    } finally {
+      setIsStarting(false);
+    }
   };
 
   return (
@@ -48,13 +75,14 @@ export default function ChallengeScreen() {
       </div>
 
       <div className="flex gap-3">
-        <Button onClick={handleStart} variant="primary" disabled={!isOnBase}>
-          START LEVEL
+        <Button onClick={handleStart} variant="primary" disabled={!isOnBase || isStarting}>
+          {isStarting ? 'STARTING…' : 'START LEVEL'}
         </Button>
         <Button onClick={() => setScreen('menu')} variant="secondary">
           BACK
         </Button>
       </div>
+      {error && <div className="text-xs text-red-400">{error}</div>}
     </div>
   );
 }

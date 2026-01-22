@@ -26,8 +26,7 @@ export async function startOnchainGame(difficulty: number) {
     address: GAME_ADDRESS_TYPED,
     abi: RONIN_MINES_GAME_ABI,
     functionName: 'startGame',
-    // TEMP: bypass strict wagmi arg typing for Vercel build
-    args: [difficulty] as any,
+    args: [difficulty] as const,
   });
 
   const receipt = await waitForTransactionReceipt(wagmiConfig, { hash });
@@ -46,8 +45,7 @@ export async function finishOnchainGame(
     address: GAME_ADDRESS_TYPED,
     abi: RONIN_MINES_GAME_ABI,
     functionName: 'finishGame',
-    // TEMP: bypass strict wagmi arg typing for Vercel build
-    args: [BigInt(gameId), won, timeMs, moves] as any,
+    args: [BigInt(gameId), won, timeMs, moves] as const,
   });
 
   await waitForTransactionReceipt(wagmiConfig, { hash });

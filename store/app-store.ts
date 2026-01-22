@@ -48,7 +48,7 @@ export const useAppStore = create<AppStore>()(
         field: 1,
         flag: 1,
       },
-
+      
       setScreen: (screen) => set({ currentScreen: screen }),
       setCoins: (coins) => set({ coins }),
       setInputMode: (mode) => set({ inputMode: mode }),
@@ -69,7 +69,9 @@ export const useAppStore = create<AppStore>()(
     }),
     {
       name: 'mine-ronin-app',
-      storage: createJSONStorage(() => (typeof window !== 'undefined' ? localStorage : noopStorage)),
+      storage: createJSONStorage(() =>
+        typeof window !== 'undefined' ? localStorage : noopStorage,
+      ),
       partialize: (state) => ({
         coins: state.coins,
         inputMode: state.inputMode,

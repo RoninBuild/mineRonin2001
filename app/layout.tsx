@@ -9,10 +9,20 @@ const APP_URL =
 export const metadata: Metadata = {
   title: 'Mine Ronin',
   description: 'Minesweeper on Base',
+  icons: {
+    icon: '/head-base.png',
+    apple: '/app-icon.png',
+  },
   openGraph: {
     title: 'Mine Ronin',
     description: 'Play Minesweeper, earn rewards on Base',
-    images: ['/og-image.png'],
+    images: ['/logo-horizontal.png'],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Mine Ronin',
+    description: 'Play Minesweeper, earn rewards on Base',
+    images: ['/logo-horizontal.png'],
   },
   other: {
     'fc:frame': 'vNext',
