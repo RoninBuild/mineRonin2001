@@ -10,12 +10,14 @@ export function revealCell(
   grid: Cell[][],
   config: GridConfig,
   row: number,
-  col: number
+  col: number,
+  mask?: boolean[][]
 ): RevealResult {
   const newGrid = grid.map(r => r.map(c => ({ ...c })));
   
   function reveal(r: number, c: number) {
     if (r < 0 || r >= config.rows || c < 0 || c >= config.cols) return;
+    if (mask && mask[r]?.[c] === false) return;
     if (newGrid[r][c].isRevealed || newGrid[r][c].isFlagged) return;
     
     newGrid[r][c].isRevealed = true;
@@ -51,15 +53,20 @@ export function revealCell(
   
   // Check win
   let revealedCount = 0;
+  let activeCells = 0;
   for (let r = 0; r < config.rows; r++) {
     for (let c = 0; c < config.cols; c++) {
+      if (mask && mask[r]?.[c] === false) {
+        continue;
+      }
+      activeCells++;
       if (newGrid[r][c].isRevealed && !newGrid[r][c].isMine) {
         revealedCount++;
       }
     }
   }
   
-  const won = revealedCount === config.rows * config.cols - config.mines;
+  const won = revealedCount === activeCells - config.mines;
   
   return { grid: newGrid, gameOver: won, won };
 }

@@ -1,19 +1,51 @@
 'use client';
 
-import type { ChangeEvent } from 'react';
+import { useState, type ChangeEvent } from 'react';
 import { useAppStore } from '@/store/app-store';
 import { useGameStore } from '@/store/game-store';
 import Button from '@/components/ui/Button';
 import Panel from '@/components/ui/Panel';
+import { useChainId } from 'wagmi';
+import { base } from 'viem/chains';
+import { startOnchainGame } from '@/lib/onchain/game';
 
 export default function CustomScreen() {
   const { setScreen } = useAppStore();
-  const { customConfig, setCustomConfig, setDifficulty, startGame } = useGameStore();
+  const { customConfig, setCustomConfig, setDifficulty, startGame, setCurrentGameId } =
+    useGameStore();
+  const chainId = useChainId();
+  const isOnBase = chainId === base.id;
+  const [isStarting, setIsStarting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleStart = () => {
-    setDifficulty('custom');
-    startGame();
-    setScreen('playing');
+  const handleStart = async () => {
+    setError(null);
+
+    if (chainId !== base.id) {
+      setError('Switch to Base mainnet to start.');
+      return;
+    }
+
+    setIsStarting(true);
+
+    try {
+      const { gameId } = await startOnchainGame(3);
+      if (gameId === null) {
+        setError('Unable to read game ID from chain.');
+        setIsStarting(false);
+        return;
+      }
+
+      setCurrentGameId(gameId);
+      setDifficulty('custom');
+      startGame();
+      setScreen('playing');
+    } catch (err) {
+      console.error('startGame failed', err);
+      setError('Start failed. Please try again.');
+    } finally {
+      setIsStarting(false);
+    }
   };
 
   const maxMines = Math.floor(customConfig.rows * customConfig.cols * 0.3);
@@ -80,13 +112,14 @@ export default function CustomScreen() {
       </div>
 
       <div className="flex gap-3">
-        <Button onClick={handleStart} variant="primary">
-          START GAME
+        <Button onClick={handleStart} variant="primary" disabled={!isOnBase || isStarting}>
+          {isStarting ? 'STARTING…' : 'START GAME'}
         </Button>
         <Button onClick={() => setScreen('difficulty')} variant="secondary">
           BACK
         </Button>
       </div>
+      {error && <div className="text-xs text-red-400">{error}</div>}
     </div>
   );
 }
