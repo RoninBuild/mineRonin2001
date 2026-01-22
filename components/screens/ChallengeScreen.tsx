@@ -1,188 +1,88 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useAccount } from 'wagmi';
+import { useState } from 'react';
+import { useChainId } from 'wagmi';
+import { base } from 'viem/chains';
 import { useAppStore } from '@/store/app-store';
 import { useGameStore } from '@/store/game-store';
-import { enterWeeklyChallenge, checkChallengeEntry } from '@/lib/onchain/challenge';
-import { getDailyLeaderboard, getStreakLeaderboard, getWeeklyLeaderboard } from '@/lib/db/leaderboards';
-import { logEvent } from '@/lib/db/analytics';
+import { CHALLENGE_LEVELS } from '@/lib/challenge/levels';
 import Button from '@/components/ui/Button';
-
-type ChallengeMode = 'daily' | 'streak' | 'weekly';
-type LeaderboardEntry = {
-  address: string;
-  time?: number;
-  streak?: number;
-};
+import { startOnchainGame } from '@/lib/onchain/game';
 
 export default function ChallengeScreen() {
-  const { address } = useAccount();
   const { setScreen } = useAppStore();
-  const { setMode, startGame } = useGameStore();
+  const { setMode, startGame, setChallengeLevelId, setCurrentGameId } = useGameStore();
+  const [selectedLevel, setSelectedLevel] = useState(1);
+  const chainId = useChainId();
+  const isOnBase = chainId === base.id;
+  const [isStarting, setIsStarting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const [selectedMode, setSelectedMode] = useState<ChallengeMode>('daily');
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
-  const [hasEnteredWeekly, setHasEnteredWeekly] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const handleStart = async () => {
+    setError(null);
 
-  useEffect(() => {
-    loadLeaderboard();
-  }, [selectedMode]);
-
-  useEffect(() => {
-    if (address && selectedMode === 'weekly') {
-      checkWeeklyEntry();
+    if (chainId !== base.id) {
+      setError('Switch to Base mainnet to start.');
+      return;
     }
-  }, [address, selectedMode]);
 
-  const loadLeaderboard = async () => {
+    setIsStarting(true);
+
     try {
-      let data: LeaderboardEntry[] = [];
-      if (selectedMode === 'daily') {
-        data = await getDailyLeaderboard();
-      } else if (selectedMode === 'streak') {
-        data = await getStreakLeaderboard();
-      } else if (selectedMode === 'weekly') {
-        data = await getWeeklyLeaderboard();
+      const { gameId } = await startOnchainGame(3);
+      if (gameId === null) {
+        setError('Unable to read game ID from chain.');
+        setIsStarting(false);
+        return;
       }
-      setLeaderboard(data);
-    } catch (error) {
-      console.error('Failed to load leaderboard:', error);
-    }
-  };
 
-  const checkWeeklyEntry = async () => {
-    if (!address) return;
-    const entered = await checkChallengeEntry(address);
-    setHasEnteredWeekly(entered);
-  };
-
-  const handleEnterWeekly = async () => {
-    if (!address) return;
-
-    setLoading(true);
-    try {
-      logEvent('challenge_enter', address, { mode: 'weekly' });
-
-      const txHash = await enterWeeklyChallenge(address);
-
-      if (txHash) {
-        setHasEnteredWeekly(true);
-        alert('Entered weekly challenge! 1 USDC paid ✓');
-      }
-    } catch (error) {
-      console.error('Challenge entry failed:', error);
-      alert('Failed to enter challenge');
+      setCurrentGameId(gameId);
+      setMode('challenge');
+      setChallengeLevelId(selectedLevel);
+      startGame();
+      setScreen('playing');
+    } catch (err) {
+      console.error('startGame failed', err);
+      setError('Start failed. Please try again.');
     } finally {
-      setLoading(false);
+      setIsStarting(false);
     }
-  };
-
-  const handleStartChallenge = () => {
-    setMode(selectedMode);
-    startGame();
-    setScreen('playing');
   };
 
   return (
-    <div className="flex flex-col items-center h-full gap-4 p-6 overflow-y-auto">
+    <div className="flex flex-col items-center h-full gap-4 py-2 overflow-y-auto">
       <h2 className="text-2xl font-bold text-purple-500">CHALLENGE</h2>
+      <div className="text-xs text-gray-400">Level {selectedLevel}/30</div>
 
-      {/* Mode selector */}
-      <div className="flex flex-col gap-2 w-full max-w-sm">
-        <button
-          onClick={() => setSelectedMode('daily')}
-          className={`px-4 py-3 rounded-lg font-medium transition-all ${
-            selectedMode === 'daily'
-              ? 'bg-purple-600 text-white'
-              : 'bg-gray-800 text-gray-400'
-          }`}
-        >
-          <div className="font-bold">DAILY RUN</div>
-          <div className="text-xs opacity-80">Same board for everyone</div>
-        </button>
-
-        <button
-          onClick={() => setSelectedMode('streak')}
-          className={`px-4 py-3 rounded-lg font-medium transition-all ${
-            selectedMode === 'streak'
-              ? 'bg-purple-600 text-white'
-              : 'bg-gray-800 text-gray-400'
-          }`}
-        >
-          <div className="font-bold">STREAK RUSH</div>
-          <div className="text-xs opacity-80">Win streak leaderboard</div>
-        </button>
-
-        <button
-          onClick={() => setSelectedMode('weekly')}
-          className={`px-4 py-3 rounded-lg font-medium transition-all ${
-            selectedMode === 'weekly'
-              ? 'bg-purple-600 text-white'
-              : 'bg-gray-800 text-gray-400'
-          }`}
-        >
-          <div className="font-bold">WEEKLY POOL</div>
-          <div className="text-xs opacity-80">1 USDC entry • Prize pool</div>
-        </button>
+      <div className="grid grid-cols-3 gap-2 w-full max-w-sm">
+        {CHALLENGE_LEVELS.map((level) => (
+          <button
+            key={level.id}
+            type="button"
+            onClick={() => setSelectedLevel(level.id)}
+            className={`rounded-lg px-3 py-2 text-xs font-semibold ${
+              selectedLevel === level.id ? 'bg-purple-600 text-white' : 'bg-gray-800 text-gray-300'
+            }`}
+          >
+            {level.id}
+          </button>
+        ))}
       </div>
 
-      {/* Weekly entry button */}
-      {selectedMode === 'weekly' && !hasEnteredWeekly && (
-        <button
-          onClick={handleEnterWeekly}
-          disabled={loading}
-          className="w-full max-w-sm btn-primary disabled:opacity-50"
-        >
-          {loading ? 'Processing...' : 'ENTER WEEKLY (1 USDC)'}
-        </button>
-      )}
-
-      {/* Start button */}
-      <Button
-        onClick={handleStartChallenge}
-        variant="primary"
-        disabled={selectedMode === 'weekly' && !hasEnteredWeekly}
-      >
-        {selectedMode === 'weekly' && !hasEnteredWeekly
-          ? 'ENTER CHALLENGE FIRST'
-          : 'START CHALLENGE'}
-      </Button>
-
-      {/* Leaderboard */}
-      <div className="w-full max-w-sm panel p-4">
-        <h3 className="text-sm font-bold text-gray-400 mb-3">LEADERBOARD</h3>
-        <div className="space-y-2">
-          {leaderboard.slice(0, 10).map((entry, idx) => (
-            <div
-              key={idx}
-              className="flex justify-between items-center text-sm"
-            >
-              <div className="flex items-center gap-2">
-                <span className="text-gray-500">#{idx + 1}</span>
-                <span className="text-blue-300">
-                  {entry.address.slice(0, 6)}...{entry.address.slice(-4)}
-                </span>
-              </div>
-              <span className="text-yellow-400 font-bold">
-                {selectedMode === 'streak'
-                  ? `${entry.streak ?? 0} 🔥`
-                  : `${entry.time ?? 0}s`}
-              </span>
-            </div>
-          ))}
-          {leaderboard.length === 0 && (
-            <div className="text-gray-500 text-center text-xs">
-              No entries yet
-            </div>
-          )}
-        </div>
+      <div className="panel w-full max-w-sm text-xs text-gray-400">
+        {CHALLENGE_LEVELS[selectedLevel - 1]?.name ?? 'Level'} • Mines:{' '}
+        {CHALLENGE_LEVELS[selectedLevel - 1]?.mines ?? 0}
       </div>
 
-      <Button onClick={() => setScreen('menu')} variant="secondary">
-        BACK
-      </Button>
+      <div className="flex gap-3">
+        <Button onClick={handleStart} variant="primary" disabled={!isOnBase || isStarting}>
+          {isStarting ? 'STARTING…' : 'START LEVEL'}
+        </Button>
+        <Button onClick={() => setScreen('menu')} variant="secondary">
+          BACK
+        </Button>
+      </div>
+      {error && <div className="text-xs text-red-400">{error}</div>}
     </div>
   );
 }
