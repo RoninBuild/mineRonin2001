@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "@coinbase/onchainkit/styles.css";
+
 import { Providers } from "@/components/providers/Providers";
 import FarcasterReady from "@/components/FarcasterReady";
 
@@ -18,11 +20,7 @@ export const metadata: Metadata = {
     title: "Mine Ronin",
     description: "Play Minesweeper, earn rewards on Base",
     url: APP_URL,
-    images: [
-      {
-        url: `${APP_URL}/logo-horizontal.png`,
-      },
-    ],
+    images: [{ url: `${APP_URL}/logo-horizontal.png` }],
   },
   twitter: {
     card: "summary_large_image",
@@ -31,11 +29,9 @@ export const metadata: Metadata = {
     images: [`${APP_URL}/logo-horizontal.png`],
   },
   other: {
-    // Важно: для мини-аппа лучше абсолютные урлы
     "fc:frame": "vNext",
     "fc:frame:image": `${APP_URL}/head-base.png`,
     "fc:frame:button:1": "Open Mine Ronin",
-    // На корне оставим link (для шаринга лучше /share с launch_miniapp)
     "fc:frame:button:1:action": "link",
     "fc:frame:button:1:target": APP_URL,
   },
@@ -44,6 +40,7 @@ export const metadata: Metadata = {
 export const viewport = {
   width: "device-width",
   initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -53,7 +50,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="w-full min-h-[100dvh] bg-base-bg text-white antialiased">
+      <body
+        className={[
+          "w-full min-h-[100dvh] bg-base-bg text-white antialiased",
+          // мобильные webview: убираем жесты, которые могут глушить тапы
+          "overscroll-none",
+          // иногда помогает с кликабельностью и быстрыми тапами
+          "touch-manipulation",
+        ].join(" ")}
+      >
         {/* КЛЮЧЕВО: чтобы Farcaster не висел на splash */}
         <FarcasterReady />
         <Providers>{children}</Providers>
