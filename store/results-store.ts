@@ -59,9 +59,7 @@ export const useResultsStore = create<ResultsState>()(
     }),
     {
       name: 'mine-ronin-results',
-      storage: createJSONStorage(() =>
-        typeof window !== 'undefined' ? localStorage : noopStorage,
-      ),
+      storage: createJSONStorage(() => (typeof window !== 'undefined' ? localStorage : noopStorage)),
     },
   ),
 );

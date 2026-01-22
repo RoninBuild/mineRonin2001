@@ -11,6 +11,7 @@ export default function StatsScreen() {
   const { setScreen } = useAppStore();
   const { results } = useResultsStore();
   const { entries } = useRaceStore();
+
   const [activeTab, setActiveTab] = useState<
     'easy' | 'medium' | 'hard' | 'custom' | 'challenge' | 'race'
   >('easy');
@@ -53,20 +54,18 @@ export default function StatsScreen() {
       <div className="flex flex-col gap-3 w-full max-w-sm">
         <Panel>
           <div className="flex flex-wrap gap-2">
-            {(['easy', 'medium', 'hard', 'custom', 'challenge', 'race'] as const).map(
-              (tab) => (
-                <button
-                  key={tab}
-                  type="button"
-                  onClick={() => setActiveTab(tab)}
-                  className={`px-3 py-2 text-xs rounded-lg ${
-                    activeTab === tab ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-300'
-                  }`}
-                >
-                  {tab.toUpperCase()}
-                </button>
-              ),
-            )}
+            {(['easy', 'medium', 'hard', 'custom', 'challenge', 'race'] as const).map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => setActiveTab(tab)}
+                className={`px-3 py-2 text-xs rounded-lg ${
+                  activeTab === tab ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-300'
+                }`}
+              >
+                {tab.toUpperCase()}
+              </button>
+            ))}
           </div>
         </Panel>
 
@@ -90,9 +89,7 @@ export default function StatsScreen() {
         <Panel>
           <div className="flex justify-between items-center">
             <span className="text-gray-400">Best Time</span>
-            <span className="text-white font-bold text-lg">
-              {bestTime ? `${bestTime}s` : '-'}
-            </span>
+            <span className="text-white font-bold text-lg">{bestTime ? `${bestTime}s` : '-'}</span>
           </div>
         </Panel>
 
@@ -101,33 +98,27 @@ export default function StatsScreen() {
           {filteredResults.length === 0 ? (
             <div className="text-sm text-gray-500">No data yet.</div>
           ) : (
-            <svg
-              width={chartWidth}
-              height={chartHeight}
-              viewBox={`0 0 ${chartWidth} ${chartHeight}`}
-            >
-              <polyline
-                fill="none"
-                stroke="#60a5fa"
-                strokeWidth="2"
-                points={chartPoints}
-              />
-              {filteredResults.map((result, index) => {
-                const x =
-                  filteredResults.length > 1
-                    ? (index / (filteredResults.length - 1)) * chartWidth
-                    : chartWidth / 2;
-                const y = chartHeight - (result.timeSeconds / maxTime) * chartHeight;
-                return (
-                  <circle
-                    key={result.id}
-                    cx={x}
-                    cy={y}
-                    r="2"
-                    fill={result.won ? '#34d399' : '#f87171'}
-                  />
-                );
-              })}
+            <svg width={chartWidth} height={chartHeight} viewBox={`0 0 ${chartWidth} ${chartHeight}`}>
+              <polyline fill="none" stroke="#60a5fa" strokeWidth="2" points={chartPoints} />
+              {filteredResults
+                .slice()
+                .reverse()
+                .map((result, index) => {
+                  const x =
+                    filteredResults.length > 1
+                      ? (index / (filteredResults.length - 1)) * chartWidth
+                      : chartWidth / 2;
+                  const y = chartHeight - (result.timeSeconds / maxTime) * chartHeight;
+                  return (
+                    <circle
+                      key={result.id}
+                      cx={x}
+                      cy={y}
+                      r="2"
+                      fill={result.won ? '#34d399' : '#f87171'}
+                    />
+                  );
+                })}
             </svg>
           )}
         </Panel>
@@ -140,9 +131,7 @@ export default function StatsScreen() {
             <div className="space-y-2 text-xs">
               {filteredResults.map((result) => (
                 <div key={result.id} className="flex justify-between text-gray-300">
-                  <span className="text-gray-500">
-                    {new Date(result.date).toLocaleDateString()}
-                  </span>
+                  <span className="text-gray-500">{new Date(result.date).toLocaleDateString()}</span>
                   <span>
                     {result.won ? 'W' : 'L'}
                     {result.levelId ? ` L${result.levelId}` : ''}
@@ -163,9 +152,14 @@ export default function StatsScreen() {
             ) : (
               <div className="space-y-2 text-xs">
                 {raceTop.map((entry, index) => (
-                  <div key={`${entry.address}-${entry.date}`} className="flex justify-between text-gray-300">
+                  <div
+                    key={`${entry.address}-${entry.date}`}
+                    className="flex justify-between text-gray-300"
+                  >
                     <span className="text-gray-500">#{index + 1}</span>
-                    <span>{entry.address.slice(0, 6)}...{entry.address.slice(-4)}</span>
+                    <span>
+                      {entry.address.slice(0, 6)}...{entry.address.slice(-4)}
+                    </span>
                     <span>{entry.timeSeconds}s</span>
                   </div>
                 ))}
