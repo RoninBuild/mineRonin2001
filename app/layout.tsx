@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   },
   other: {
     'fc:frame': 'vNext',
-    'fc:frame:image': `${APP_URL}/og-image.png`,
+    'fc:frame:image': '/logo-horizontal.png',
     'fc:frame:button:1': 'Play Now',
     'fc:frame:button:1:action': 'link',
     'fc:frame:button:1:target': APP_URL,
