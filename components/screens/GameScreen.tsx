@@ -188,55 +188,6 @@ export default function GameScreen() {
     setCurrentGameId,
   ]);
 
-  const handleCellClick = (row: number, col: number) => {
-    if (!isPlaying || grid[row][col].isFlagged) return;
-    if (mask && mask[row]?.[col] === false) return;
-    incrementMoves();
-    if (mode === 'race' && raceActive) {
-      addRaceMoves(1);
-    }
-
-    // First click - place mines avoiding this cell
-    if (!hasFirstClick) {
-      const gridWithMines = placeMines(grid, config, row, col, undefined, mask);
-      const finalGrid = calculateNeighborMines(gridWithMines, config, mask);
-      setGrid(finalGrid);
-      recordFirstClick();
-      logEvent('first_click', address || null, { difficulty, mode });
-      
-      // Now reveal the cell
-      setTimeout(() => handleReveal(finalGrid, row, col), 50);
-      return;
-    }
-
-    if (currentGameId === null) {
-      setSaveError('Missing game ID. Result not saved on-chain.');
-      return;
-    }
-
-    if (!isOnBase) {
-      setSaveError('Connect to Base to save results.');
-      return;
-    }
-
-    const timeMs = Math.max(0, Date.now() - firstClickTime);
-    const clampedMoves = Math.min(moves, 65535);
-
-    const submitFinish = async () => {
-      setIsSaving(true);
-      try {
-        await finishOnchainGame(currentGameId, gameWon, timeMs, clampedMoves);
-      } catch (err) {
-        console.error('finishGame failed', err);
-        setSaveError('Failed to save on-chain.');
-      } finally {
-        setIsSaving(false);
-      }
-    };
-
-    void submitFinish();
-  }, [showEndModal, mode, currentGameId, isOnBase, firstClickTime, gameWon, moves]);
-
   const handleReveal = (currentGrid: Cell[][], row: number, col: number) => {
     const result = revealCell(currentGrid, config, row, col, mask);
     setGrid(result.grid);
@@ -334,7 +285,10 @@ export default function GameScreen() {
     <div className="flex h-full w-full flex-col gap-4">
       <div className="flex items-center justify-between rounded-2xl border border-base-border bg-base-panel px-4 py-3">
         <div className="flex flex-col">
-          <span className="text-sm text-blue-300">MINE RONIN</span>
+          <div className="flex items-center gap-2">
+            <img src="/logo-square.png" alt="Mine Ronin" className="h-5 w-5" />
+            <span className="text-sm text-blue-300">MINE RONIN</span>
+          </div>
           <span className="text-xs text-gray-400">{shortAddress}</span>
           <span className="text-[10px] text-gray-500">
             Starts: {totalStarts ? totalStarts.toString() : '—'} · Finishes:{' '}
