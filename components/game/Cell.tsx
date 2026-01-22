@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { Cell as CellType } from '@/lib/minesweeper/grid';
 
 type CellProps = {
@@ -22,7 +23,7 @@ export default function Cell({ cell, size, onClick, onFlag }: CellProps) {
   };
 
   let className = 'cell ';
-  let content = '';
+  let content: ReactNode = '';
 
   if (cell.isRevealed) {
     if (cell.isMine) {
