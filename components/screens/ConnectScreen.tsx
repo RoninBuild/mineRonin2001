@@ -1,81 +1,48 @@
 'use client';
 
-import { useMemo } from 'react';
-import {
-  useAccount,
-  useChainId,
-  useConnect,
-  useDisconnect,
-} from 'wagmi';
+import { Wallet } from '@coinbase/onchainkit/wallet';
+import { useAccount, useChainId } from 'wagmi';
 import { base } from 'viem/chains';
 
 export default function ConnectScreen() {
   const { isConnected } = useAccount();
   const chainId = useChainId();
-  const { connectors, connect, isPending } = useConnect();
-  const { disconnect } = useDisconnect();
 
   const isOnBase = chainId === base.id;
-  const connectOptions = useMemo(
-    () =>
-      connectors.map((connector) => ({
-        id: connector.id,
-        name: connector.name,
-        ready: connector.ready ?? true,
-        onClick: () => connect({ connector }),
-      })),
-    [connectors, connect],
-  );
 
   return (
-    <div className="relative z-10 flex flex-col items-center justify-center h-full gap-8 px-6">
-      <div className="text-center">
-        <h1 className="text-5xl font-bold mb-4 text-blue-500">
+    <div className="relative z-10 flex min-h-[100dvh] w-full flex-col items-center justify-center gap-8 px-6 text-center">
+      <div className="flex flex-col items-center gap-3">
+        <img
+          src="/logo-square.png"
+          alt="Mine Ronin"
+          width={96}
+          height={96}
+          className="rounded-2xl"
+        />
+        <h1 className="text-3xl font-bold text-blue-500">
           MINE RONIN
         </h1>
-        <p className="text-gray-400">Minesweeper on Base</p>
+        <p className="text-sm text-gray-400">
+          Minesweeper on Base
+        </p>
       </div>
 
+      {/* Основной коннект (OnchainKit) */}
       {!isConnected && (
-        <div className="flex w-full flex-col gap-3">
-          {connectOptions.map((connector) => {
-            const canConnect = connector.ready && !isPending;
-
-            return (
-              <button
-                key={connector.id}
-                type="button"
-                className="btn-primary w-full"
-                onClick={() => {
-                  if (!canConnect) return;
-                  connector.onClick();
-                }}
-                disabled={!canConnect}
-                aria-disabled={!canConnect}
-              >
-                {isPending ? 'Connecting...' : `Connect ${connector.name}`}
-              </button>
-            );
-          })}
+        <div className="w-full max-w-sm">
+          <Wallet />
         </div>
       )}
 
+      {/* Подсказка, если подключён не туда */}
       {isConnected && !isOnBase && (
-        <div className="flex flex-col items-center gap-3 text-center">
-          <p className="text-sm text-yellow-300">
-            Switch to Base Mainnet.
-          </p>
-          <button
-            type="button"
-            className="btn-primary"
-            onClick={() => disconnect()}
-          >
-            Disconnect
-          </button>
+        <div className="mt-2 rounded-xl border border-yellow-500/40 bg-yellow-500/10 p-3 text-sm text-yellow-200">
+          Please switch to Base Mainnet.
         </div>
       )}
 
-      <div className="text-xs text-gray-500 text-center">
+      <div className="mt-2 text-xs text-gray-500">
         Base mainnet only
       </div>
     </div>
