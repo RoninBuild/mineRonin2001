@@ -5,11 +5,12 @@ import { noopStorage } from '@/lib/utils/noopStorage';
 export type GameResult = {
   id: string;
   date: string;
-  difficulty: 'easy' | 'medium' | 'hard' | 'custom';
+  difficulty: 'easy' | 'medium' | 'hard' | 'custom' | 'challenge' | 'race';
   timeSeconds: number;
   moves: number;
   won: boolean;
   reward: number;
+  levelId?: number;
 };
 
 type ResultsState = {
@@ -31,7 +32,12 @@ export const useResultsStore = create<ResultsState>()(
           const results = [result, ...state.results].slice(0, 50);
           const bestTimes = { ...state.bestTimes };
 
-          if (result.won && result.difficulty !== 'custom') {
+          if (
+            result.won &&
+            (result.difficulty === 'easy' ||
+              result.difficulty === 'medium' ||
+              result.difficulty === 'hard')
+          ) {
             const currentBest = bestTimes[result.difficulty];
             if (currentBest === null || result.timeSeconds < currentBest) {
               bestTimes[result.difficulty] = result.timeSeconds;
@@ -53,9 +59,7 @@ export const useResultsStore = create<ResultsState>()(
     }),
     {
       name: 'mine-ronin-results',
-      storage: createJSONStorage(() =>
-        typeof window !== 'undefined' ? localStorage : noopStorage,
-      ),
+      storage: createJSONStorage(() => (typeof window !== 'undefined' ? localStorage : noopStorage)),
     },
   ),
 );

@@ -9,7 +9,8 @@ type GridProps = {
   config: GridConfig;
   onCellClick: (row: number, col: number) => void;
   onToggleFlag: (row: number, col: number) => void;
-  flagMode: boolean;
+  inputMode: 'tap' | 'flag';
+  mask?: boolean[][];
 };
 
 export default function Grid({
@@ -17,7 +18,8 @@ export default function Grid({
   config,
   onCellClick,
   onToggleFlag,
-  flagMode,
+  inputMode,
+  mask,
 }: GridProps) {
   if (grid.length === 0) return null;
 
@@ -57,21 +59,32 @@ export default function Grid({
         }}
       >
         {grid.map((row, r) =>
-          row.map((cell, c) => (
-            <Cell
-              key={`${r}-${c}`}
-              cell={cell}
-              size={cellSize}
-              onClick={() => {
-                if (flagMode) {
-                  onToggleFlag(r, c);
-                } else {
-                  onCellClick(r, c);
-                }
-              }}
-              onFlag={() => onToggleFlag(r, c)}
-            />
-          ))
+          row.map((cell, c) => {
+            const isMasked = mask ? mask[r]?.[c] === false : false;
+            if (isMasked) {
+              return (
+                <div
+                  key={`${r}-${c}`}
+                  style={{ width: cellSize, height: cellSize }}
+                />
+              );
+            }
+            return (
+              <Cell
+                key={`${r}-${c}`}
+                cell={cell}
+                size={cellSize}
+                onClick={() => {
+                  if (inputMode === 'flag') {
+                    onToggleFlag(r, c);
+                  } else {
+                    onCellClick(r, c);
+                  }
+                }}
+                onFlag={() => onToggleFlag(r, c)}
+              />
+            );
+          })
         )}
       </div>
     </div>

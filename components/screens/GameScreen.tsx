@@ -5,12 +5,14 @@ import { useAccount, useChainId, useReadContract } from 'wagmi';
 import { useGameStore, DIFFICULTY_CONFIGS } from '@/store/game-store';
 import { useAppStore } from '@/store/app-store';
 import { useResultsStore } from '@/store/results-store';
+import { useRaceStore } from '@/store/race-store';
+
 import { createEmptyGrid, calculateNeighborMines } from '@/lib/minesweeper/grid';
 import { placeMines } from '@/lib/minesweeper/mines';
 import { revealCell, toggleFlag as toggleCellFlag } from '@/lib/minesweeper/reveal';
 import Grid from '@/components/game/Grid';
 import ResultModal from '@/components/game/ResultModal';
-import FlagModeToggle from '@/components/game/FlagModeToggle';
+
 import { calculateCoinReward } from '@/lib/coins';
 import { logEvent } from '@/lib/db/analytics';
 import { base } from 'viem/chains';
@@ -18,12 +20,16 @@ import { shareResult } from '@/lib/share';
 import { finishOnchainGame } from '@/lib/onchain/game';
 import { GAME_ADDRESS } from '@/lib/onchain/addresses';
 import { RONIN_MINES_GAME_ABI } from '@/lib/onchain/abi/roninMinesGame';
+import { CHALLENGE_LEVELS } from '@/lib/challenge/levels';
 
 export default function GameScreen() {
   const { address } = useAccount();
   const chainId = useChainId();
-  const { coins, setScreen, setCoins } = useAppStore();
+
+  const { coins, setScreen, setCoins, inputMode, setInputMode } = useAppStore();
   const { addResult } = useResultsStore();
+  const { addEntry } = useRaceStore();
+
   const {
     difficulty,
     mode,
@@ -34,7 +40,6 @@ export default function GameScreen() {
     gameEndTime,
     gameWon,
     isPlaying,
-    flagMode,
     hasFirstClick,
     recordFirstClick,
     endGame,
@@ -43,14 +48,42 @@ export default function GameScreen() {
     moves,
     currentGameId,
     setCurrentGameId,
+
+    challengeLevelId,
+    raceActive,
+    raceLevelIndex,
+    raceStartTime,
+    raceMoves,
+    advanceRaceLevel,
+    addRaceMoves,
+    finishRace,
   } = useGameStore();
 
   const [timer, setTimer] = useState(0);
+  const [raceTimer, setRaceTimer] = useState(0);
   const [showEndModal, setShowEndModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
-  const config = difficulty === 'custom' ? customConfig : DIFFICULTY_CONFIGS[difficulty];
+  const challengeLevel =
+    mode === 'challenge' || mode === 'race'
+      ? CHALLENGE_LEVELS[(mode === 'race' ? raceLevelIndex : (challengeLevelId ?? 1) - 1)] ?? null
+      : null;
+
+  const config =
+    challengeLevel !== null
+      ? { rows: challengeLevel.height, cols: challengeLevel.width, mines: challengeLevel.mines }
+      : difficulty === 'custom'
+      ? customConfig
+      : DIFFICULTY_CONFIGS[difficulty];
+
+  const mask = challengeLevel?.mask;
+
+  const levelLabel =
+    challengeLevel !== null
+      ? `${mode === 'race' ? 'RACE' : 'CHALLENGE'} ${challengeLevel.id}/30`
+      : difficulty.toUpperCase();
+
   const isOnBase = chainId === base.id;
   const shortAddress = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : '—';
 
@@ -60,13 +93,13 @@ export default function GameScreen() {
   }, [address, isOnBase]);
 
   const { data: totalStarts } = useReadContract({
-    address: GAME_ADDRESS as `0x${string}`,
+    address: GAME_ADDRESS,
     abi: RONIN_MINES_GAME_ABI,
     functionName: 'totalStarts',
   });
 
   const { data: totalFinishes } = useReadContract({
-    address: GAME_ADDRESS as `0x${string}`,
+    address: GAME_ADDRESS,
     abi: RONIN_MINES_GAME_ABI,
     functionName: 'totalFinishes',
   });
@@ -77,7 +110,7 @@ export default function GameScreen() {
       const emptyGrid = createEmptyGrid(config);
       setGrid(emptyGrid);
     }
-  }, [isPlaying, grid.length]);
+  }, [isPlaying, grid.length, config, setGrid]);
 
   // Timer effect (starts from first click)
   useEffect(() => {
@@ -87,7 +120,18 @@ export default function GameScreen() {
       }, 100);
       return () => clearInterval(interval);
     }
+    return undefined;
   }, [isPlaying, firstClickTime]);
+
+  useEffect(() => {
+    if (mode === 'race' && raceActive && raceStartTime > 0) {
+      const interval = setInterval(() => {
+        setRaceTimer(Math.floor((Date.now() - raceStartTime) / 1000));
+      }, 250);
+      return () => clearInterval(interval);
+    }
+    return undefined;
+  }, [mode, raceActive, raceStartTime]);
 
   // Show end modal when game ends
   useEffect(() => {
@@ -103,8 +147,13 @@ export default function GameScreen() {
     }
   }, [isPlaying]);
 
+  // Save casual runs on-chain only
   useEffect(() => {
     if (!showEndModal) return;
+
+    if (mode !== 'casual') {
+      return;
+    }
 
     if (currentGameId === null) {
       setSaveError('Missing game ID. Result not saved on-chain.');
@@ -132,20 +181,81 @@ export default function GameScreen() {
     };
 
     void submitFinish();
-  }, [showEndModal, currentGameId, isOnBase, firstClickTime, gameWon, moves, setCurrentGameId]);
+  }, [showEndModal, mode, currentGameId, isOnBase, firstClickTime, gameWon, moves]);
+
+  const handleReveal = (currentGrid: any[][], row: number, col: number) => {
+    const result = revealCell(currentGrid, config, row, col, mask);
+    setGrid(result.grid);
+
+    if (result.gameOver) {
+      endGame(result.won);
+
+      const totalTimeSeconds =
+        mode === 'race' && raceActive
+          ? Math.floor((Date.now() - raceStartTime) / 1000)
+          : Math.floor((Date.now() - firstClickTime) / 1000);
+
+      const resultDifficulty = mode === 'challenge' ? 'challenge' : mode === 'race' ? 'race' : difficulty;
+
+      const reward =
+        result.won && difficulty !== 'custom' && mode === 'casual'
+          ? calculateCoinReward(difficulty, totalTimeSeconds)
+          : 0;
+
+      addResult({
+        id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        date: new Date().toISOString(),
+        difficulty: resultDifficulty,
+        timeSeconds: totalTimeSeconds,
+        moves: mode === 'race' ? raceMoves : moves,
+        won: result.won,
+        reward,
+        levelId: mode === 'challenge' ? challengeLevelId ?? undefined : undefined,
+      });
+
+      if (reward > 0) {
+        setCoins(coins + reward);
+      }
+
+      if (mode === 'race' && raceActive) {
+        if (result.won && raceLevelIndex >= CHALLENGE_LEVELS.length - 1 && address) {
+          addEntry({
+            address,
+            timeSeconds: totalTimeSeconds,
+            moves: raceMoves,
+            date: Date.now(),
+          });
+        }
+        if (!result.won || raceLevelIndex >= CHALLENGE_LEVELS.length - 1) {
+          finishRace();
+        }
+      }
+
+      if (address) {
+        logEvent(result.won ? 'win' : 'lose', address, {
+          difficulty: resultDifficulty,
+          mode,
+          time: totalTimeSeconds,
+        });
+      }
+    }
+  };
 
   const handleCellClick = (row: number, col: number) => {
     if (!isPlaying || grid[row][col].isFlagged) return;
+    if (mask && mask[row]?.[col] === false) return;
+
     incrementMoves();
+    if (mode === 'race' && raceActive) addRaceMoves(1);
 
     // First click - place mines avoiding this cell
     if (!hasFirstClick) {
-      const gridWithMines = placeMines(grid, config, row, col);
-      const finalGrid = calculateNeighborMines(gridWithMines, config);
+      const gridWithMines = placeMines(grid, config, row, col, undefined, mask);
+      const finalGrid = calculateNeighborMines(gridWithMines, config, mask);
       setGrid(finalGrid);
       recordFirstClick();
       logEvent('first_click', address || null, { difficulty, mode });
-      
+
       // Now reveal the cell
       setTimeout(() => handleReveal(finalGrid, row, col), 50);
       return;
@@ -154,46 +264,13 @@ export default function GameScreen() {
     handleReveal(grid, row, col);
   };
 
-  const handleReveal = (currentGrid: any[][], row: number, col: number) => {
-    const result = revealCell(currentGrid, config, row, col);
-    setGrid(result.grid);
-
-    if (result.gameOver) {
-      endGame(result.won);
-      
-      const timeSeconds = Math.floor((Date.now() - firstClickTime) / 1000);
-      const reward =
-        result.won && difficulty !== 'custom'
-          ? calculateCoinReward(difficulty, timeSeconds)
-          : 0;
-
-      addResult({
-        id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-        date: new Date().toISOString(),
-        difficulty,
-        timeSeconds,
-        moves,
-        won: result.won,
-        reward,
-      });
-
-      if (reward > 0) {
-        setCoins(coins + reward);
-      }
-      
-      if (address) {
-        logEvent(result.won ? 'win' : 'lose', address, {
-          difficulty,
-          mode,
-          time: timeSeconds,
-        });
-      }
-    }
-  };
-
   const handleToggleFlag = (row: number, col: number) => {
     if (!isPlaying || !hasFirstClick) return;
+    if (mask && mask[row]?.[col] === false) return;
+
     incrementMoves();
+    if (mode === 'race' && raceActive) addRaceMoves(1);
+
     const newGrid = toggleCellFlag(grid, row, col);
     setGrid(newGrid);
   };
@@ -217,9 +294,7 @@ export default function GameScreen() {
           >
             {networkLabel}
           </span>
-          <span className="rounded-full bg-black/40 px-3 py-1 text-xs text-yellow-300">
-            💰 {coins}
-          </span>
+          <span className="rounded-full bg-black/40 px-3 py-1 text-xs text-yellow-300">💰 {coins}</span>
         </div>
       </div>
 
@@ -229,7 +304,8 @@ export default function GameScreen() {
           config={config}
           onCellClick={handleCellClick}
           onToggleFlag={handleToggleFlag}
-          flagMode={flagMode}
+          inputMode={inputMode}
+          mask={mask}
         />
       </div>
 
@@ -254,10 +330,7 @@ export default function GameScreen() {
             if (!hasFirstClick) return;
             const timeSeconds = Math.floor((Date.now() - firstClickTime) / 1000);
             shareResult(gameWon, difficulty, timeSeconds);
-            logEvent('share_result', address || null, {
-              difficulty,
-              time: timeSeconds,
-            });
+            logEvent('share_result', address || null, { difficulty, time: timeSeconds });
           }}
           className="btn-secondary flex-1 text-sm"
         >
@@ -267,9 +340,30 @@ export default function GameScreen() {
 
       <div className="flex items-center justify-between gap-3">
         <div className="panel px-3 py-2 text-xs text-blue-200">
-          ⏱ {timer}s · {difficulty.toUpperCase()} · {moves} moves
+          ⏱ {mode === 'race' && raceActive ? raceTimer : timer}s · {levelLabel} · {moves} moves
         </div>
-        <FlagModeToggle />
+
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => setInputMode('tap')}
+            className={`px-3 py-2 text-xs rounded-lg ${
+              inputMode === 'tap' ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-300'
+            }`}
+          >
+            TAP MODE
+          </button>
+          <button
+            type="button"
+            onClick={() => setInputMode('flag')}
+            className={`px-3 py-2 text-xs rounded-lg ${
+              inputMode === 'flag' ? 'bg-blue-600 text-white' : 'bg-gray-800 text-gray-300'
+            }`}
+          >
+            FLAG MODE
+          </button>
+        </div>
+
         <button
           onClick={() => {
             resetGame();
@@ -284,16 +378,42 @@ export default function GameScreen() {
       {showEndModal && (
         <ResultModal
           won={gameWon}
-          difficulty={difficulty}
-          timeSeconds={Math.floor((Date.now() - firstClickTime) / 1000)}
-          moves={moves}
+          difficulty={levelLabel}
+          timeSeconds={
+            mode === 'race' && raceActive ? raceTimer : Math.floor((Date.now() - firstClickTime) / 1000)
+          }
+          moves={mode === 'race' ? raceMoves : moves}
           reward={
-            gameWon && difficulty !== 'custom'
+            gameWon && difficulty !== 'custom' && mode === 'casual'
               ? calculateCoinReward(difficulty, Math.floor((Date.now() - firstClickTime) / 1000))
               : 0
           }
           isSaving={isSaving}
           errorMessage={saveError}
+          nextLevelLabel={
+            mode === 'challenge' && gameWon && challengeLevelId !== null && challengeLevelId < 30
+              ? `NEXT LEVEL (${challengeLevelId + 1}/30)`
+              : mode === 'race' && gameWon && raceLevelIndex < CHALLENGE_LEVELS.length - 1
+              ? `NEXT LEVEL (${raceLevelIndex + 2}/30)`
+              : null
+          }
+          onNextLevel={
+            mode === 'challenge' && gameWon && challengeLevelId !== null && challengeLevelId < 30
+              ? () => {
+                  setShowEndModal(false);
+                  resetGame();
+                  useGameStore.getState().setChallengeLevelId(challengeLevelId + 1);
+                  useGameStore.getState().startGame();
+                }
+              : mode === 'race' && gameWon && raceLevelIndex < CHALLENGE_LEVELS.length - 1
+              ? () => {
+                  setShowEndModal(false);
+                  advanceRaceLevel();
+                  resetGame();
+                  useGameStore.getState().startGame();
+                }
+              : undefined
+          }
           onPlayAgain={() => {
             setShowEndModal(false);
             resetGame();

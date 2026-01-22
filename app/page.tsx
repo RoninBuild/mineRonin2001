@@ -15,6 +15,7 @@ import CustomScreen from '@/components/screens/CustomScreen';
 import ShopScreen from '@/components/screens/ShopScreen';
 import StatsScreen from '@/components/screens/StatsScreen';
 import ChallengeScreen from '@/components/screens/ChallengeScreen';
+import RaceScreen from '@/components/screens/RaceScreen';
 import GameScreen from '@/components/screens/GameScreen';
 
 export default function Home() {
@@ -108,6 +109,7 @@ export default function Home() {
           {currentScreen === 'shop' && <ShopScreen />}
           {currentScreen === 'stats' && <StatsScreen />}
           {currentScreen === 'challenge' && <ChallengeScreen />}
+          {currentScreen === 'race' && <RaceScreen />}
           {currentScreen === 'playing' && <GameScreen />}
           {currentScreen === 'ended' && <GameScreen />}
         </div>

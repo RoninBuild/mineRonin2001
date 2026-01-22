@@ -13,7 +13,9 @@ type ResultModalProps = {
   reward: number;
   isSaving?: boolean;
   errorMessage?: string | null;
+  nextLevelLabel?: string | null;
   onPlayAgain: () => void;
+  onNextLevel?: () => void;
   onGoToStats: () => void;
   onClose: () => void;
 };
@@ -26,7 +28,9 @@ export default function ResultModal({
   reward,
   isSaving = false,
   errorMessage = null,
+  nextLevelLabel = null,
   onPlayAgain,
+  onNextLevel,
   onGoToStats,
   onClose,
 }: ResultModalProps) {
@@ -83,30 +87,28 @@ export default function ResultModal({
         </div>
 
         <div className="flex flex-col gap-2">
-          <button
-            onClick={handleShare}
-            className="btn-secondary text-sm"
-            disabled={isSaving}
-          >
+          <button onClick={handleShare} className="btn-secondary text-sm" disabled={isSaving}>
             SHARE RESULT
           </button>
-          <button
-            onClick={onPlayAgain}
-            className="btn-primary text-sm"
-            disabled={isSaving}
-          >
+
+          {onNextLevel && nextLevelLabel && (
+            <button onClick={onNextLevel} className="btn-primary text-sm" disabled={isSaving}>
+              {nextLevelLabel}
+            </button>
+          )}
+
+          <button onClick={onPlayAgain} className="btn-secondary text-sm" disabled={isSaving}>
             PLAY AGAIN
           </button>
-          <button
-            onClick={onGoToStats}
-            className="btn-secondary text-sm"
-            disabled={isSaving}
-          >
+
+          <button onClick={onGoToStats} className="btn-secondary text-sm" disabled={isSaving}>
             GO TO STATS
           </button>
+
           <button onClick={onClose} className="btn-secondary text-sm" disabled={isSaving}>
             CLOSE
           </button>
+
           {isSaving && <div className="text-xs text-blue-300">Saving on-chain…</div>}
           {errorMessage && <div className="text-xs text-red-400">{errorMessage}</div>}
         </div>

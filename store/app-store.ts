@@ -11,11 +11,13 @@ type Screen =
   | 'ended'
   | 'shop'
   | 'stats'
-  | 'challenge';
+  | 'challenge'
+  | 'race';
 
 type AppStore = {
   currentScreen: Screen;
   coins: number;
+  inputMode: 'tap' | 'flag';
   ownedSkins: {
     fields: number[];
     flags: number[];
@@ -24,9 +26,10 @@ type AppStore = {
     field: number;
     flag: number;
   };
-  
+
   setScreen: (screen: Screen) => void;
   setCoins: (coins: number) => void;
+  setInputMode: (mode: 'tap' | 'flag') => void;
   addOwnedSkin: (category: 'fields' | 'flags', id: number) => void;
   selectSkin: (category: 'field' | 'flag', id: number) => void;
 };
@@ -36,6 +39,7 @@ export const useAppStore = create<AppStore>()(
     (set) => ({
       currentScreen: 'connect',
       coins: 0,
+      inputMode: 'tap',
       ownedSkins: {
         fields: [1],
         flags: [1],
@@ -44,9 +48,10 @@ export const useAppStore = create<AppStore>()(
         field: 1,
         flag: 1,
       },
-      
+
       setScreen: (screen) => set({ currentScreen: screen }),
       setCoins: (coins) => set({ coins }),
+      setInputMode: (mode) => set({ inputMode: mode }),
       addOwnedSkin: (category, id) =>
         set((state) => ({
           ownedSkins: {
@@ -64,11 +69,10 @@ export const useAppStore = create<AppStore>()(
     }),
     {
       name: 'mine-ronin-app',
-      storage: createJSONStorage(() =>
-        typeof window !== 'undefined' ? localStorage : noopStorage,
-      ),
+      storage: createJSONStorage(() => (typeof window !== 'undefined' ? localStorage : noopStorage)),
       partialize: (state) => ({
         coins: state.coins,
+        inputMode: state.inputMode,
         ownedSkins: state.ownedSkins,
         selectedSkins: state.selectedSkins,
       }),
