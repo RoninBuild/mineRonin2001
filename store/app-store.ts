@@ -26,7 +26,7 @@ type AppStore = {
     field: number;
     flag: number;
   };
-  
+
   setScreen: (screen: Screen) => void;
   setCoins: (coins: number) => void;
   setInputMode: (mode: 'tap' | 'flag') => void;

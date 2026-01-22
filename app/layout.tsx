@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Oxanium } from 'next/font/google';
 import './globals.css';
 import { Providers } from '@/components/providers/Providers';
 

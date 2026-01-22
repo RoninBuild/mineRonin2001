@@ -75,6 +75,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       customConfig: { ...state.customConfig, ...config },
     })),
   setGrid: (grid) => set({ grid }),
+
   startGame: () =>
     set({
       grid: [],
@@ -86,6 +87,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       hasFirstClick: false,
       moves: 0,
     }),
+
   recordFirstClick: () =>
     set((state) => ({
       firstClickTime: state.firstClickTime === 0 ? Date.now() : state.firstClickTime,
