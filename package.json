@@ -11,9 +11,11 @@
     "contracts:deploy": "cd contracts && forge script script/Deploy.s.sol --rpc-url $BASE_RPC_URL --broadcast --verify"
   },
   "dependencies": {
+    "@coinbase/onchainkit": "^1.1.2",
     "@farcaster/miniapp-sdk": "^0.2.1",
     "@supabase/supabase-js": "^2.39.0",
     "@tanstack/react-query": "^5.0.0",
+    "ethers": "^6.16.0",
     "next": "14.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
