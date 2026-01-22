@@ -1,4 +1,9 @@
 {
+  "accountAssociation": {
+    "header": "eyJmaWQiOjQyNjU5MSwidHlwZSI6ImF1dGgiLCJrZXkiOiIweEU0QjNkNzIxZjFiODYyZWI5OEIyNkY5MjgyNDVCNmEyODFDNWY2Q0YifQ",
+    "payload": "eyJkb21haW4iOiJtaW5lLXJvbmluMjAwMS52ZXJjZWwuYXBwIn0",
+    "signature": "3ijrZhbE7FYUGabpCh0AZrjiAMOCH6vkbv+if67eqtAT951ZBOW+8F1X8M24Laewe7xL9C+MkX3WID2pU8ITCxs="
+  },
   "name": "Mine Ronin",
   "description": "Minesweeper on Base",
   "iconUrl": "https://mine-ronin2001.vercel.app/app-icon.png",
