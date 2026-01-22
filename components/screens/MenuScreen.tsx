@@ -19,8 +19,8 @@ export default function MenuScreen() {
             <div className="text-xs text-gray-400">{shortAddress}</div>
           </div>
           <div className="flex flex-col items-end gap-2">
-            <div className="h-8 w-12 rounded-lg border border-base-border bg-black/30 text-[10px] text-gray-500 flex items-center justify-center">
-              LOGO
+            <div className="h-8 w-12 overflow-hidden rounded-lg border border-base-border bg-black/30">
+              <img src="/logo-square.png" alt="Mine Ronin" className="h-full w-full object-contain" />
             </div>
             <button
               type="button"
@@ -33,22 +33,29 @@ export default function MenuScreen() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-3 w-full max-w-xs">
-        <Button onClick={() => setScreen('difficulty')} variant="primary">
-          PLAY
-        </Button>
-        <Button onClick={() => setScreen('challenge')} variant="secondary">
-          CHALLENGE
-        </Button>
-        <Button onClick={() => setScreen('shop')} variant="primary">
-          SHOP
-        </Button>
-        <Button onClick={() => setScreen('stats')} variant="primary">
-          STATS
-        </Button>
-        <Button onClick={() => setScreen('race')} variant="secondary">
-          RACE (30 LEVELS)
-        </Button>
+      <div className="flex flex-col items-center gap-4 w-full max-w-xs">
+        <img
+          src="/logo-horizontal.png"
+          alt="Mine Ronin"
+          className="w-full max-w-xs object-contain"
+        />
+        <div className="flex flex-col gap-3 w-full">
+          <Button onClick={() => setScreen('difficulty')} variant="primary">
+            PLAY
+          </Button>
+          <Button onClick={() => setScreen('challenge')} variant="secondary">
+            CHALLENGE
+          </Button>
+          <Button onClick={() => setScreen('shop')} variant="primary">
+            SHOP
+          </Button>
+          <Button onClick={() => setScreen('stats')} variant="primary">
+            STATS
+          </Button>
+          <Button onClick={() => setScreen('race')} variant="secondary">
+            RACE (30 LEVELS)
+          </Button>
+        </div>
       </div>
 
       <div className="panel px-4 py-2 mt-4">

@@ -285,7 +285,10 @@ export default function GameScreen() {
     <div className="flex h-full w-full flex-col gap-4">
       <div className="flex items-center justify-between rounded-2xl border border-base-border bg-base-panel px-4 py-3">
         <div className="flex flex-col">
-          <span className="text-sm text-blue-300">MINE RONIN</span>
+          <div className="flex items-center gap-2">
+            <img src="/logo-square.png" alt="Mine Ronin" className="h-5 w-5" />
+            <span className="text-sm text-blue-300">MINE RONIN</span>
+          </div>
           <span className="text-xs text-gray-400">{shortAddress}</span>
           <span className="text-[10px] text-gray-500">
             Starts: {totalStarts ? totalStarts.toString() : '—'} · Finishes:{' '}
