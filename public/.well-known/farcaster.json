@@ -4,8 +4,17 @@
     "payload": "eyJkb21haW4iOiJtaW5lLXJvbmluMjAwMS52ZXJjZWwuYXBwIn0",
     "signature": "3ijrZhbE7FYUGabpCh0AZrjiAMOCH6vkbv+if67eqtAT951ZBOW+8F1X8M24Laewe7xL9C+MkX3WID2pU8ITCxs="
   },
-  "name": "Mine Ronin",
-  "description": "Minesweeper on Base",
-  "iconUrl": "https://mine-ronin2001.vercel.app/app-icon.png",
-  "homeUrl": "https://mine-ronin2001.vercel.app"
+  "miniapp": {
+    "version": "1",
+    "name": "Mine Ronin",
+    "homeUrl": "https://mine-ronin2001.vercel.app/",
+    "iconUrl": "https://mine-ronin2001.vercel.app/app-icon.png",
+    "splashImageUrl": "https://mine-ronin2001.vercel.app/head-base.png",
+    "splashBackgroundColor": "#050B1A",
+    "subtitle": "Minesweeper on Base",
+    "description": "Play Minesweeper on Base.",
+    "primaryCategory": "games",
+    "tags": ["base", "minesweeper", "game", "ronin"],
+    "buttonTitle": "Open"
+  }
 }
