@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import "@coinbase/onchainkit/styles.css";
-
 import { Providers } from "@/components/providers/Providers";
 import FarcasterReady from "@/components/FarcasterReady";
 
@@ -34,6 +32,7 @@ export const metadata: Metadata = {
     "fc:frame:button:1": "Open Mine Ronin",
     "fc:frame:button:1:action": "link",
     "fc:frame:button:1:target": APP_URL,
+    "base:app_id": "697272f33a92926b661fd093",
   },
 };
 
@@ -50,6 +49,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="stylesheet" href="/onchainkit.css" />
+      </head>
       <body
         className={[
           "w-full min-h-[100dvh] bg-base-bg text-white antialiased",
