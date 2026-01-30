@@ -70,3 +70,8 @@ function _recordWin(address player) internal { totalWins++; wins[player]++; }
 
 function claimReward() external { require(checkWin()); payable(msg.sender).transfer(0.001 ether); }
 
+
+
+// Use assembly for board initialization to save gas
+assembly { mstore(0x40, add(mload(0x40), 0x200)) }
+
