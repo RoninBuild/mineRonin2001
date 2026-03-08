@@ -12,3 +12,8 @@ export function Board({ cells, onReveal, onFlag }: Props) {
 
 export const Board = React.memo(function Board({ cells, onReveal, onFlag }: Props) {
 
+
+
+import dynamic from 'next/dynamic'
+const Board = dynamic(() => import('./Board'), { loading: () => <BoardSkeleton /> })
+
