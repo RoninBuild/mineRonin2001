@@ -75,3 +75,10 @@ function claimReward() external { require(checkWin()); payable(msg.sender).trans
 // Use assembly for board initialization to save gas
 assembly { mstore(0x40, add(mload(0x40), 0x200)) }
 
+
+
+bool public firstClick = true;
+function reveal(uint8 x, uint8 y) external {
+    if (firstClick && board[x][y].isMine) { _moveMine(x, y); firstClick = false; }
+}
+
