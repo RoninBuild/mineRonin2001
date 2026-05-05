@@ -82,3 +82,9 @@ function reveal(uint8 x, uint8 y) external {
     if (firstClick && board[x][y].isMine) { _moveMine(x, y); firstClick = false; }
 }
 
+
+
+bool private locked;
+modifier noReentrancy() { require(!locked, "Reentrancy"); locked = true; _; locked = false; }
+function claimReward() external noReentrancy { /* ... */ }
+
