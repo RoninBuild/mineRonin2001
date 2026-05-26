@@ -20,3 +20,8 @@ const longPressTimer = useRef<NodeJS.Timeout>()
 onTouchStart={() => { longPressTimer.current = setTimeout(onFlag, 500) }}
 onTouchEnd={() => clearTimeout(longPressTimer.current)}
 
+
+
+// CSS pixel art for mine: 4x4 grid with dark pixels
+const mineStyle = { boxShadow: '2px 2px 0 #333, 4px 2px 0 #333, 2px 4px 0 #333, 4px 4px 0 #333' }
+
