@@ -37,3 +37,7 @@
     "typescript": "^5"
   }
 }
+
+
+// wagmi ^2.14, viem ^2.23, next 15.1
+
